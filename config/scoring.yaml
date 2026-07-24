@@ -1,0 +1,190 @@
+# Relay Grant-Finder — Eligibility Gates + Fit-Scoring Rubric
+# Portable spec. Two steps: HARD GATES first (kill disqualifiers), THEN weighted fit score.
+# Cross-family design (Claude + GPT converged). Calibrated to Relay (see relay-profile.yaml).
+# Grounding to spot-verify: grants.gov eligibility guidance; Uniform Guidance 2 CFR 200.306 (cost-share).
+
+meta:
+  updated: "2026-07-07"
+  principle: "A large award must never mask an eligibility, geography, or cost-share disqualifier."
+  verify_rule: "Deadline / amount / eligibility extracted from the PRIMARY source page every run, never recalled."
+
+# ── STEP 1: HARD GATES ── any fail => NO_GO (or HUMAN_REVIEW where noted). No score computed if gated out.
+hard_gates:
+  - id: legal_eligibility
+    rule: "Relay is an allowed party for THIS instrument. GRANT path: allowed applicant type — nonprofit / IHE / graduate school / educator-prep provider (EPP) / eligible subrecipient/partner. VENDOR path (contract_procurement | cooperative_contract): Relay can be a PAID VENDOR for this service — a distinct test from grant applicant-type (see district_vendor_path below)."
+    fail: NO_GO
+    relay_note: "Relay clears the GRANT path for USDE educator-prep grants (501c3 + MSCHE master's IHE + CAEP EPP + Title IV). Relay clears the VENDOR path for PD/residency/leadership/tutoring/certification services it already sells nationwide (Teacher Professional Education)."
+    instrument_branch: "Apply the grant path to discretionary_grant/cooperative_agreement/formula_subgrant; apply the vendor path to contract_procurement/cooperative_contract. Do NOT NO_GO a district service RFP just because Relay isn't a grant 'applicant type' — that conflates the two paths."
+  - id: geography
+    rule: "Opportunity covers >=1 Relay jurisdiction OR is national/open to any eligible US nonprofit."
+    fail: NO_GO
+  - id: mission_boundary
+    rule: "Purpose can reasonably fund teacher prep, educator pipeline, school leadership, certification, residency, educator diversity, high-need schools, or research/evaluation."
+    fail: NO_GO
+  - id: deadline_feasibility
+    rule: "Full proposal due in <10 business days (or LOI <3 business days) without existing materials."
+    fail: HUMAN_REVIEW   # not auto-NO_GO; a strong fit with a tight deadline may still warrant a look
+  - id: match_affordability
+    rule: "Mandatory match exceeds confirmed available match or creates audit risk (per 2 CFR 200.306: verifiable, allowable, not double-counted)."
+    fail: NO_GO
+  - id: allowable_use
+    rule: "Funds can support Relay's relevant activities/allowable costs (not restricted to uses Relay can't deploy)."
+    fail: NO_GO
+  - id: source_confidence
+    rule: "Primary source link present AND deadline/eligibility verifiable this run."
+    fail: HUMAN_REVIEW   # never allow GO on unverifiable critical facts
+
+# ── DISTRICT / PROCUREMENT LAYER (Phase C) ── applies ONLY to district-tier records and
+# contract_procurement / cooperative_contract instruments. The target-district CARVE-OUT reverses
+# the LEA-demote (below) so a target's service RFP is scored on merit — but the carve-out is NOT a
+# pass: the record must clear the vendor path AND these procurement hard-gates before any GO.
+district_vendor_path:
+  applies_when: "source_type == 'district' OR funding_instrument in [contract_procurement, cooperative_contract]"
+  vendor_eligibility:
+    rule: "Relay can be a paid vendor/subrecipient delivering THIS service (PD, residency, instructional coaching, leadership/NPAF, high-dosage tutoring, alt-certification, SpEd/ELL PD & staffing). This is the legal_eligibility VENDOR path — see relay-profile.yaml vendor_stance."
+    clears: "Relay clears vendor eligibility for its named service lines nationwide; it does NOT clear for goods/construction/food/transport/facilities (those are NO_GO on mission_boundary, not vendor eligibility)."
+  target_district_carve_out:
+    rule: "If the opportunity is FROM or NAMES a config/districts.yaml target (match by nces_lea_id or district name) → set target_district=true and EXEMPT it from the calibration.demote LEA-only rule; route through the vendor path instead."
+    guard: "Carve-out != auto-GO. After the carve-out the record still passes the procurement_hard_gates; a bare topical match with an unmet gate is QUALIFY/NO_GO, never GO."
+    high_need_pass_handling:
+      # districts.yaml high_need_pass can be: true | pending_verification | (with gate_flag: marginal | tn_relaxed)
+      "true": "Full carve-out."
+      "pending_verification": "Carve-out applies to DISCOVERY but cap the recommendation at QUALIFY until the district's high-need gate is confirmed (e.g. Jackson-Madison TN manual TDOE pull). Name the pending gate."
+      "gate_flag: marginal": "Carve-out applies; note the marginal gate (e.g. Fulton GA 51% vs 34.7% direct-cert) in the rationale — do not treat need-profile as settled."
+      "gate_flag: tn_relaxed": "Carve-out applies; note the state metric understates poverty (TN direct-cert) so the account was admitted on the relaxed gate."
+
+# Procurement hard-gates: any HARD fail => NO_GO/QUALIFY with the gate NAMED. These are what stop the
+# carve-out from becoming an auto-GO. Most are HUMAN_REVIEW (feasibility questions), not auto-NO_GO —
+# the point is to surface the barrier, not silently kill a good fit.
+procurement_hard_gates:
+  applies_when: "funding_instrument in [contract_procurement, cooperative_contract] OR source_type == 'district'"
+  gates:
+    - id: vendor_registration
+      rule: "Vendor registration / prequalification complete (or completable before the deadline). Some portals require approval BEFORE bid visibility (e.g. Atlanta B2Gnow 5-7 day; NYC DOE finance360; Oracle iSupplier mandatory pre-reg)."
+      fail: HUMAN_REVIEW
+    - id: mandatory_pre_bid
+      rule: "Any MANDATORY pre-bid / pre-proposal conference is still attendable (missing a mandatory pre-bid = disqualified)."
+      fail: NO_GO
+    - id: insurance_bonding_background
+      rule: "Insurance / bonding limits + background-check / fingerprinting feasible for Relay staff on-site."
+      fail: HUMAN_REVIEW
+    - id: state_authorization_present
+      rule: "Relay is authorized to operate/deliver in the district's state (jurisdictions.authorized in relay-profile)."
+      fail: NO_GO
+    - id: local_preference_setaside
+      rule: "Local-preference / resident-bidder / MWBE set-aside is not disqualifying (Relay is not local/MWBE in most footprints)."
+      fail: HUMAN_REVIEW
+    - id: response_window_feasible
+      rule: "Response window is feasible without existing materials (mirrors deadline_feasibility for RFPs)."
+      fail: HUMAN_REVIEW
+    - id: incumbent_renewal_risk
+      rule: "Not a pro-forma renewal/re-bid an incumbent is heavily favored to keep (wired-bid risk). Low win probability => WATCH, not GO."
+      fail: HUMAN_REVIEW
+    - id: subcontracting_permitted
+      rule: "If Relay would partner/sub rather than prime, subcontracting is permitted by the solicitation."
+      fail: HUMAN_REVIEW
+
+# ── STEP 2: WEIGHTED FIT SCORE ── each dimension 0-5; weights sum to 100.
+# raw = sum(weight_i * score_i / 5);  final = max(0, raw - confidence_penalty)
+dimensions:
+  - { id: mission_program_fit,        weight: 18, anchor5: "Directly funds teacher prep/residency/cert/educator diversity/school leadership/high-need pipeline" }
+  - { id: eligibility_match,          weight: 14, anchor5: "Relay clearly eligible as PRIME applicant" }
+  - { id: financial_value,            weight: 12, anchor5: "Meaningful award, flexible costs, acceptable indirect/admin treatment" }
+  - { id: program_readiness_evidence, weight: 10, anchor5: "Fits existing Relay programs, data, partnerships, outcomes (no new model needed)" }
+  - { id: effort_deadline_runway,     weight: 10, anchor5: "Simple/medium lift with adequate runway" }
+  - { id: win_probability,            weight: 10, anchor5: "Strong fit, limited applicant pool, favorable priorities, repeatable evidence" }
+  - { id: geographic_beneficiary_fit, weight:  8, anchor5: "Explicitly serves Relay states/DC or communities Relay already serves" }
+  - { id: match_compliance_burden,    weight:  8, anchor5: "No match / low burden; requirements align with current systems" }
+  - { id: funder_relationship,        weight:  5, anchor5: "Existing relationship, invitation, prior award, or warm path" }
+  - { id: strategic_value,            weight:  5, anchor5: "Advances a priority market, partnership, policy, growth, or proof point" }
+
+confidence_penalty:   # harsher per cross-family review 2026-07-07 — unknowns carry real operational cost
+  0:  "primary source verified; all critical fields known"
+  6:  "one critical field uncertain (amount, deadline, match, or geography)"
+  12: "two critical fields uncertain"
+  20: "3+ uncertain, stale, or conflicting sources"
+  eligibility_rule: "UNKNOWN eligibility caps the recommendation at QUALIFY and applies -12, UNLESS the next action is a fast (<1 week) yes/no eligibility check. 'Likely eligible by applicant type' is NOT 'eligible' — capture the exact eligibility quote + the Relay fact needed to prove it."
+
+# ── RECOMMENDATION MAPPING ──
+recommendation_thresholds:
+  - { min: 85, rec: GO_TIER_A, meaning: "Pursue unless leadership overrides" }
+  - { min: 70, rec: GO_TIER_B, meaning: "Worth pursuing if staff capacity exists" }
+  - { min: 55, rec: QUALIFY,   meaning: "Human review; seek clarification / partner / LOI-only path" }
+  - { min: 40, rec: WATCH,     meaning: "Do not apply now; monitor or cultivate funder" }
+  - { min: 0,  rec: NO_GO,     meaning: "Do not pursue" }
+overrides:
+  - "Any failed hard gate => NO_GO (state which gate)."
+  - "Any critical unknown => cap at QUALIFY (never GO) until verified."
+  - "Low pursuit_readiness caps the rec regardless of fit (e.g. impossible deadline, missing required assets)."
+
+# ── DECISION SIGNALS (show SEPARATELY; never hide inside one blended score) — cross-family review 2026-07-07 ──
+decision_signals:
+  fit: "0-100 weighted mission/program/financial/etc. fit (above)."
+  eligibility_confidence: "High | Medium | Low — WITH the exact eligibility quote + excluded applicant types + 'Relay fact needed to prove eligibility'."
+  financial_reality: "headline award vs NET-TO-RELAY. Break out institutional $ vs student stipends/scholarships vs partner subawards vs required pass-through vs indirect recovery. A large scholarship pass-through (e.g. Noyce) is NOT large institutional revenue."
+  pursuit_readiness: "High | Medium | Low — can Relay realistically mount a competitive application in time, with the required assets? Low readiness caps the rec regardless of fit."
+
+funding_instrument:   # NOT interchangeable — different economics / compliance / decision owners
+  values: [discretionary_grant, cooperative_agreement, contract_procurement, cooperative_contract, formula_subgrant, scholarship_fellowship_pass_through, technical_assistance_center, prize, forecast]
+  cooperative_contract_note: "cooperative_contract = a purchasing-co-op vehicle (TIPS/OMNIA/BuyBoard/Sourcewell/AEPA) where ONE competitive award lets many member districts buy without their own RFP. Relay's warmest district-sell path is often 'get on co-op Y', not 'wait for district X's RFP'. Score the co-op award itself as the opportunity; note which target districts it reaches (districts.yaml coop_hooks)."
+
+prime_partner_viability:
+  values: [prime_viable, partner_only, subrecipient_viable, procurement_vendor_viable, not_viable]
+  note: "'partner_only' items often need cultivation MONTHS before the NOFO — surface a 'cultivate by' date; do not treat as passive watch."
+
+pursuit_path:   # the minimum viable next action — pick exactly one
+  values: [apply_as_prime_now, attend_webinar, ask_eligibility_question, find_prime_or_partner, prepare_next_cycle, do_not_touch_until_invited]
+
+prefilter_audit:
+  note: "fetch.py drops off-domain records deterministically. Each run logs a SAMPLE of dropped titles (state/audit-<date>.json) so a human can spot educator-prep money hiding behind 'human capital / workforce / clinical residency / shortage area / talent pipeline / apprenticeship'. Review periodically; never assume the prefilter is lossless."
+
+# ── RELAY CALIBRATION ──
+calibration:
+  favor: [educator_prep, teacher_residency, licensure_certification_pathways, school_leadership,
+          educator_diversity, high_need_partnerships, outcomes_evaluation]
+  demote: "District-only / LEA-only / K-12-operator-only GRANT opps default to QUALIFY or NO_GO unless a credible partner/subrecipient role exists (set requires_partner=true). CARVE-OUT (Phase C): this demote does NOT apply when target_district=true (opportunity is from/names a config/districts.yaml target) — those route through district_vendor_path + procurement_hard_gates instead of being auto-demoted. The demote still applies to NON-target LEA-only grants."
+  relay_adjacent_language: [human_capital, talent_pipeline, workforce_development, educator_effectiveness,
+                            school_improvement, leadership_development, postsecondary_pathways]
+
+# ── STREAM 2: PARTNERSHIP HYPOTHESES (Phase C, D3) ── a NOFO/RFP already discovered by the federal/
+# state pipeline that NAMES or FAVORS a high-need LEA partner, joined to the nearest target district(s).
+# Output is a HYPOTHESIS, not an opportunity — it only becomes a lead once the feasibility fields resolve.
+partnership_hypothesis:
+  trigger: "Discovered NOFO text requires/favors a high-need LEA partner AND joins (by geography/name/nces_lea_id) to >=1 config/districts.yaml target."
+  tag: "partner_lea_match: [<nces_lea_id>...]  — the matched target district(s)."
+  label_rule: "Surface as `partnership_hypothesis` in a SEPARATE lane; never mix into the scored-opportunity table. Do NOT assign a GO/QUALIFY fit score — it is a cultivation signal, not a pursuable opp yet."
+  feasibility_fields:   # a hypothesis becomes a lead only with these attached
+    - required_partner_type       # e.g. "high-need LEA", "IHE + LEA consortium"
+    - relay_allowed_role          # prime | partner | subrecipient | vendor
+    - mou_loi_requirement         # is a signed MOU/LOI due WITH the application?
+    - match_cost_share            # required match and who carries it
+    - cultivation_lead_time       # months of relationship-building the NOFO implies
+    - cultivate_by                # explicit date = deadline minus cultivation_lead_time
+    - named_relationship_owner    # who at Relay owns the district relationship (or "none — cold")
+  grant_posture_join: "For the ~15 strategic accounts, attach the districts.yaml grant_posture_note (USASpending recipient history) so the hypothesis carries whether the district is an active/warm grantee (e.g. Chicago holds a direct TQP 84.336 — the strongest co-app signal in the set)."
+
+# ── OUTPUT FIELDS beyond scoring (added per operator 2026-07-07) ──
+output_fields:
+  opportunity_summary: "1-2 plain-language sentences: what it funds + who runs it. Shown as its own row."
+  effort_complexity: "Low | Medium | High | Very High — application COMPLEXITY, not staff-hours. Low = short LOI / simple form; Medium = narrative + budget; High = + partners/evaluation/data; Very High = + mandatory match, MOUs, multiple components."
+  funding_type: "grant | cooperative_agreement | contract | scholarship_pass_through | formula. Flags money Relay can't use as flexible operating support — e.g., scholarship pass-through (Noyce funds student scholarships, not org operations) or cooperative agreements with heavy federal involvement."
+  past_winners: "Recent notable recipients under this Assistance Listing (CFDA), via USASpending. CAVEAT: broad CFDAs (e.g. 47.076 = ALL of NSF EHR) span many programs — label as approximate and link the USASpending drill-down for the specific program. Specific CFDAs (e.g. 84.325) are reliable."
+  recurrence: "If a recurring program, note the typical cycle + predicted next deadline so WATCH items have a return date."
+
+# ── TUNING — this rubric is meant to evolve ──
+tuning:
+  note: "config/scoring.yaml IS the tunable core. Edit weights/gates/thresholds here and re-run; every digest links back to this file so the criteria stay visible and improvable over time."
+  review_cadence: "Revisit weights quarterly against actual hit/win data; log each change with a date + rationale."
+  changelog:
+    - "2026-07-07 initial rubric (cross-family design; Claude + GPT converged)."
+    - "2026-07-08 Phase C district recalibration: instrument-aware legal_eligibility (grant vs VENDOR path); district_vendor_path + target_district carve-out on the LEA-demote (carve-out != auto-GO); procurement_hard_gates (registration/pre-bid/insurance+background/state-auth/local-preference/response-window/incumbent-renewal/subcontracting); cooperative_contract instrument; partnership_hypothesis lane (partner_lea_match + feasibility fields, Stream 2); high_need_pass handling (true|pending_verification|marginal|tn_relaxed)."
+
+# ── TRIAGE PITFALL GUARDS (why the two-step design exists) ──
+pitfall_guards:
+  - "Big award, poor fit -> mission_program_fit is top weight + mission_boundary is a hard gate."
+  - "'Education' treated as auto-relevant -> require a specific Relay-aligned use, not broad ed language."
+  - "Missed cost-share -> match is BOTH a hard gate and a scored burden."
+  - "Applying too close to deadline -> deadline_feasibility gate + effort_deadline_runway dimension."
+  - "Chasing cold hypercompetitive federal -> win_probability + funder_relationship reduce score."
+  - "Optimistic assumptions on unknowns -> confidence_penalty + HUMAN_REVIEW block false GO."
+  - "Confusing contract/RFP revenue with grants -> source_type field forces different treatment."
