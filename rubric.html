@@ -118,7 +118,7 @@
       <span class="mlabel">Updated</span><span><strong>2026-07-07</strong> · latest change 2026-07-08 · Revisit weights quarterly against actual hit/win data; log each change with a date + rationale.</span>
       <span class="mlabel">Principle</span><span>"A large award must never mask an eligibility, geography, or cost-share disqualifier."</span>
       <span class="mlabel">Verify rule</span><span>Deadline / amount / eligibility extracted from the PRIMARY source page every run, never recalled.</span>
-      <span class="mlabel">Source</span><span>Generated from <a href="config/scoring.yaml">config/scoring.yaml</a> by <code>runner/render_rubric.py</code> — edit the YAML and regenerate · back to the <a href="index.html">dashboard</a></span>
+      <span class="mlabel">Source</span><span>Generated from <a href="config/scoring.yaml">config/scoring.yaml</a> by <code>runner/render_rubric.py</code>; edit the YAML and regenerate · back to the <a href="index.html">dashboard</a></span>
     </div>
   </header>
 
@@ -129,7 +129,7 @@
     <div class="fstep"><b>Vendor / procurement layer</b>District-tier records and contract instruments only: vendor path + 8 procurement gates. Target-district carve-out routes here instead of the LEA-demote.</div>
     <div class="fstep"><b>Weighted fit score</b>10 dimensions, each 0–5, weights sum to 100. raw = Σ weight × score ÷ 5.</div>
     <div class="fstep"><b>Confidence penalty</b>Deductions for unverified critical fields. final = max(0, raw − penalty). Unknown eligibility caps at QUALIFY.</div>
-    <div class="fstep"><b>Recommendation</b>Thresholds map the final score to GO TIER A · GO TIER B · QUALIFY · WATCH · NO-GO — plus overrides that no score can outvote.</div>
+    <div class="fstep"><b>Recommendation</b>Thresholds map the final score to GO TIER A · GO TIER B · QUALIFY · WATCH · NO-GO, plus overrides that no score can outvote.</div>
   </div>
 
   <h2 class="sec">Step 1 · Hard gates</h2>
@@ -148,7 +148,7 @@
   </table></div>
   <div class="callout"><b>Relay note:</b> Relay clears the GRANT path for USDE educator-prep grants (501c3 + MSCHE master's IHE + CAEP EPP + Title IV). Relay clears the VENDOR path for PD/residency/leadership/tutoring/certification services it already sells nationwide (Teacher Professional Education).</div>
 
-  <h2 class="sec">District / procurement layer <span style="font-family:var(--sans);font-size:12px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--faint)">— funding_instrument in [contract_procurement, cooperative_contract] OR source_type == 'district'</span></h2>
+  <h2 class="sec">District / procurement layer <span style="font-family:var(--sans);font-size:12px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--faint)">(funding_instrument in [contract_procurement, cooperative_contract] OR source_type == 'district')</span></h2>
   <div class="cards">
     <div class="card"><b class="t">Vendor eligibility</b>Relay can be a paid vendor/subrecipient delivering THIS service (PD, residency, instructional coaching, leadership/NPAF, high-dosage tutoring, alt-certification, SpEd/ELL PD &amp; staffing). This is the legal_eligibility VENDOR path — see relay-profile.yaml vendor_stance.<br><br>Relay clears vendor eligibility for its named service lines nationwide; it does NOT clear for goods/construction/food/transport/facilities (those are NO_GO on mission_boundary, not vendor eligibility).</div>
     <div class="card"><b class="t">Target-district carve-out</b>If the opportunity is FROM or NAMES a config/districts.yaml target (match by nces_lea_id or district name) → set target_district=true and EXEMPT it from the calibration.demote LEA-only rule; route through the vendor path instead.<br><br><b>Guard:</b> Carve-out != auto-GO. After the carve-out the record still passes the procurement_hard_gates; a bare topical match with an unmet gate is QUALIFY/NO_GO, never GO.<br><br><b>High-need handling:</b> <i>true</i>: Full carve-out. · <i>pending_verification</i>: Carve-out applies to DISCOVERY but cap the recommendation at QUALIFY until the district's high-need gate is confirmed (e.g. Jackson-Madison TN manual TDOE pull). Name the pending gate. · <i>marginal</i>: Carve-out applies; note the marginal gate (e.g. Fulton GA 51% vs 34.7% direct-cert) in the rationale — do not treat need-profile as settled. · <i>tn_relaxed</i>: Carve-out applies; note the state metric understates poverty (TN direct-cert) so the account was admitted on the relaxed gate.</div>
@@ -207,7 +207,7 @@
     <span class="mlabel">Overrides</span><span>Any failed hard gate =&gt; NO_GO (state which gate) · Any critical unknown =&gt; cap at QUALIFY (never GO) until verified · Low pursuit_readiness caps the rec regardless of fit (e.g. impossible deadline, missing required assets).</span>
   </div>
 
-  <h2 class="sec">Decision signals <span style="font-family:var(--sans);font-size:12px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--faint)">— shown separately, never blended into one number</span></h2>
+  <h2 class="sec">Decision signals <span style="font-family:var(--sans);font-size:12px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--faint)">(shown separately, never blended into one number)</span></h2>
   <div class="cards">
     <div class="card"><b class="t">Fit · 0–100</b>0-100 weighted mission/program/financial/etc. fit (above).</div>
     <div class="card"><b class="t">Eligibility confidence · H/M/L</b>High | Medium | Low — WITH the exact eligibility quote + excluded applicant types + 'Relay fact needed to prove eligibility'.</div>
@@ -217,7 +217,7 @@
 
   <h2 class="sec">Reference</h2>
   <details>
-    <summary>Funding instruments (9) — not interchangeable</summary>
+    <summary>Funding instruments (9): not interchangeable</summary>
     <div><ul>
       <li><span class="idc">discretionary_grant · cooperative_agreement · contract_procurement · cooperative_contract · formula_subgrant · scholarship_fellowship_pass_through · technical_assistance_center · prize · forecast</span></li>
       <li><b>Co-op contract note:</b> cooperative_contract = a purchasing-co-op vehicle (TIPS/OMNIA/BuyBoard/Sourcewell/AEPA) where ONE competitive award lets many member districts buy without their own RFP. Relay's warmest district-sell path is often 'get on co-op Y', not 'wait for district X's RFP'. Score the co-op award itself as the opportunity; note which target districts it reaches (districts.yaml coop_hooks).</li>
@@ -230,34 +230,34 @@
         <span class="mlabel">Viability</span><span class="idc">prime_viable · partner_only · subrecipient_viable · procurement_vendor_viable · not_viable</span>
         <span class="mlabel">Note</span><span>'partner_only' items often need cultivation MONTHS before the NOFO — surface a 'cultivate by' date; do not treat as passive watch.</span>
         <span class="mlabel">Pursuit path</span><span class="idc">apply_as_prime_now · attend_webinar · ask_eligibility_question · find_prime_or_partner · prepare_next_cycle · do_not_touch_until_invited</span>
-        <span class="mlabel">Rule</span><span>Pick exactly one — the minimum viable next action.</span>
+        <span class="mlabel">Rule</span><span>Pick exactly one: the minimum viable next action.</span>
       </div>
     </div>
   </details>
   <details>
-    <summary>Relay calibration — favor / demote / adjacent language</summary>
+    <summary>Relay calibration: favor / demote / adjacent language</summary>
     <div>
       <div class="kv">
         <span class="mlabel">Favor</span><span>educator prep · teacher residency · licensure certification pathways · school leadership · educator diversity · high need partnerships · outcomes evaluation</span>
         <span class="mlabel">Demote</span><span>District-only / LEA-only / K-12-operator-only GRANT opps default to QUALIFY or NO_GO unless a credible partner/subrecipient role exists (set requires_partner=true). CARVE-OUT (Phase C): this demote does NOT apply when target_district=true (opportunity is from/names a config/districts.yaml target) — those route through district_vendor_path + procurement_hard_gates instead of being auto-demoted. The demote still applies to NON-target LEA-only grants.</span>
-        <span class="mlabel">Adjacent language</span><span>human capital · talent pipeline · workforce development · educator effectiveness · school improvement · leadership development · postsecondary pathways — fetch.py drops off-domain records deterministically. Each run logs a SAMPLE of dropped titles (state/audit-&lt;date&gt;.json) so a human can spot educator-prep money hiding behind 'human capital / workforce / clinical residency / shortage area / talent pipeline / apprenticeship'. Review periodically; never assume the prefilter is lossless.</span>
+        <span class="mlabel">Adjacent language</span><span>human capital · talent pipeline · workforce development · educator effectiveness · school improvement · leadership development · postsecondary pathways. Prefilter audit: fetch.py drops off-domain records deterministically. Each run logs a SAMPLE of dropped titles (state/audit-&lt;date&gt;.json) so a human can spot educator-prep money hiding behind 'human capital / workforce / clinical residency / shortage area / talent pipeline / apprenticeship'. Review periodically; never assume the prefilter is lossless.</span>
       </div>
     </div>
   </details>
   <details>
-    <summary>Partnership hypotheses (Stream 2) — a separate lane, never scored</summary>
+    <summary>Partnership hypotheses (Stream 2): a separate lane, never scored</summary>
     <div>
       <p><b>Trigger:</b> Discovered NOFO text requires/favors a high-need LEA partner AND joins (by geography/name/nces_lea_id) to &gt;=1 config/districts.yaml target.</p>
       <p><b>Label rule:</b> Surface as `partnership_hypothesis` in a SEPARATE lane; never mix into the scored-opportunity table. Do NOT assign a GO/QUALIFY fit score — it is a cultivation signal, not a pursuable opp yet.</p>
       <p>A hypothesis becomes a lead only when its feasibility fields resolve:</p>
       <ul>
-        <li><span class="idc">required_partner_type</span> — e.g. "high-need LEA," "IHE + LEA consortium"</li>
-        <li><span class="idc">relay_allowed_role</span> — prime | partner | subrecipient | vendor</li>
-        <li><span class="idc">mou_loi_requirement</span> — is a signed MOU/LOI due with the application?</li>
-        <li><span class="idc">match_cost_share</span> — required match and who carries it</li>
-        <li><span class="idc">cultivation_lead_time</span> — months of relationship-building the NOFO implies</li>
-        <li><span class="idc">cultivate_by</span> — explicit date = deadline − cultivation lead time</li>
-        <li><span class="idc">named_relationship_owner</span> — who at Relay owns the district relationship (or "none — cold")</li>
+        <li><span class="idc">required_partner_type</span>: e.g. "high-need LEA," "IHE + LEA consortium"</li>
+        <li><span class="idc">relay_allowed_role</span>: prime | partner | subrecipient | vendor</li>
+        <li><span class="idc">mou_loi_requirement</span>: is a signed MOU/LOI due with the application?</li>
+        <li><span class="idc">match_cost_share</span>: required match and who carries it</li>
+        <li><span class="idc">cultivation_lead_time</span>: months of relationship-building the NOFO implies</li>
+        <li><span class="idc">cultivate_by</span>: explicit date = deadline − cultivation lead time</li>
+        <li><span class="idc">named_relationship_owner</span>: who at Relay owns the district relationship (or "none — cold")</li>
       </ul>
       <p>For the ~15 strategic accounts, attach the districts.yaml grant_posture_note (USASpending recipient history) so the hypothesis carries whether the district is an active/warm grantee (e.g. Chicago holds a direct TQP 84.336 — the strongest co-app signal in the set).</p>
     </div>
@@ -265,15 +265,15 @@
   <details>
     <summary>Digest output fields</summary>
     <div><ul>
-      <li><b>Opportunity summary</b> — 1-2 plain-language sentences: what it funds + who runs it. Shown as its own row.</li>
-      <li><b>Effort complexity</b> — Low | Medium | High | Very High — application COMPLEXITY, not staff-hours. Low = short LOI / simple form; Medium = narrative + budget; High = + partners/evaluation/data; Very High = + mandatory match, MOUs, multiple components.</li>
-      <li><b>Funding type</b> — grant | cooperative_agreement | contract | scholarship_pass_through | formula. Flags money Relay can't use as flexible operating support — e.g., scholarship pass-through (Noyce funds student scholarships, not org operations) or cooperative agreements with heavy federal involvement.</li>
-      <li><b>Past winners</b> — Recent notable recipients under this Assistance Listing (CFDA), via USASpending. CAVEAT: broad CFDAs (e.g. 47.076 = ALL of NSF EHR) span many programs — label as approximate and link the USASpending drill-down for the specific program. Specific CFDAs (e.g. 84.325) are reliable.</li>
-      <li><b>Recurrence</b> — If a recurring program, note the typical cycle + predicted next deadline so WATCH items have a return date.</li>
+      <li><b>Opportunity summary</b>: 1-2 plain-language sentences: what it funds + who runs it. Shown as its own row.</li>
+      <li><b>Effort complexity</b>: Low | Medium | High | Very High — application COMPLEXITY, not staff-hours. Low = short LOI / simple form; Medium = narrative + budget; High = + partners/evaluation/data; Very High = + mandatory match, MOUs, multiple components.</li>
+      <li><b>Funding type</b>: grant | cooperative_agreement | contract | scholarship_pass_through | formula. Flags money Relay can't use as flexible operating support — e.g., scholarship pass-through (Noyce funds student scholarships, not org operations) or cooperative agreements with heavy federal involvement.</li>
+      <li><b>Past winners</b>: Recent notable recipients under this Assistance Listing (CFDA), via USASpending. CAVEAT: broad CFDAs (e.g. 47.076 = ALL of NSF EHR) span many programs — label as approximate and link the USASpending drill-down for the specific program. Specific CFDAs (e.g. 84.325) are reliable.</li>
+      <li><b>Recurrence</b>: If a recurring program, note the typical cycle + predicted next deadline so WATCH items have a return date.</li>
     </ul></div>
   </details>
   <details>
-    <summary>Pitfall guards — why the two-step design exists</summary>
+    <summary>Pitfall guards: why the two-step design exists</summary>
     <div><ul>
       <li>Big award, poor fit -&gt; mission_program_fit is top weight + mission_boundary is a hard gate.</li>
       <li>'Education' treated as auto-relevant -&gt; require a specific Relay-aligned use, not broad ed language.</li>
@@ -287,13 +287,13 @@
   <details>
     <summary>Changelog</summary>
     <div><ul>
-      <li><b>2026-07-07</b> — initial rubric (cross-family design; Claude + GPT converged).</li>
-      <li><b>2026-07-08</b> — Phase C district recalibration: instrument-aware legal_eligibility (grant vs VENDOR path); district_vendor_path + target_district carve-out on the LEA-demote (carve-out != auto-GO); procurement_hard_gates (registration/pre-bid/insurance+background/state-auth/local-preference/response-window/incumbent-renewal/subcontracting); cooperative_contract instrument; partnership_hypothesis lane (partner_lea_match + feasibility fields, Stream 2); high_need_pass handling (true|pending_verification|marginal|tn_relaxed).</li>
+      <li><b>2026-07-07</b>: initial rubric (cross-family design; Claude + GPT converged).</li>
+      <li><b>2026-07-08</b>: Phase C district recalibration: instrument-aware legal_eligibility (grant vs VENDOR path); district_vendor_path + target_district carve-out on the LEA-demote (carve-out != auto-GO); procurement_hard_gates (registration/pre-bid/insurance+background/state-auth/local-preference/response-window/incumbent-renewal/subcontracting); cooperative_contract instrument; partnership_hypothesis lane (partner_lea_match + feasibility fields, Stream 2); high_need_pass handling (true|pending_verification|marginal|tn_relaxed).</li>
     </ul></div>
   </details>
 
   <footer>
-    <span class="mlabel">Source of truth</span><span><code>config/scoring.yaml</code> — this page is generated by <code>runner/render_rubric.py</code>; edit the YAML and re-run (<code>uv run runner/render_rubric.py</code>). Grounding: grants.gov eligibility guidance · Uniform Guidance 2 CFR 200.306 (cost-share).</span>
+    <span class="mlabel">Source of truth</span><span><code>config/scoring.yaml</code>. This page is generated by <code>runner/render_rubric.py</code>; edit the YAML and re-run (<code>uv run runner/render_rubric.py</code>). Grounding: grants.gov eligibility guidance · Uniform Guidance 2 CFR 200.306 (cost-share).</span>
     <span class="mlabel">Companions</span><span><a href="index.html">Opportunity dashboard</a> · calibration inputs in <code>config/relay-profile.yaml</code> and <code>config/districts.yaml</code></span>
   </footer>
 </div>
