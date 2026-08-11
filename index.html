@@ -6,401 +6,1277 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Relay Public Funding — Opportunity Dashboard</title>
 <style>
+  /* ── Analytical-editorial register (ported from Calenhad v3, 2026-08-11) ──
+     Sibling shell to the Relay Policy Watch dashboard: paper-and-ink research
+     desk — serif display, cobalt accent, mono micro-labels, hairline
+     discipline. Same layout grammar (sidebar facets, verdict band, horizontal
+     windows band, feed rows with inline accordion detail) adapted to the
+     funding data model. The shell is hand-maintained: weekly runs edit the
+     const DATA/HYPOTHESES/META blocks only — never rebuild this page. ── */
   :root{
-    /* Relay brand — Brand & Communications Guide (March 2023). Primary: Pacific #2C49A4,
-       Sea #6D97C9, Prussian #1D3557, Crimson #B30838. Accents (≤15%): Sea Foam, Imperial
-       Red, Orange, Dark Gray, Fog. Status colors derived from brand hues, WCAG-checked. */
-    --bg:#FFFFFF; --ink:#23272E; --head:#1D3557; --muted:#5A6472; --faint:#8A93A0;
-    --accent:#2C49A4; --crimson:#B30838; --sea:#6D97C9;
-    --tint:#E9EEF9; --hair:#E3E6EB; --chrome:#F1F3F6; --card:#FFFFFF;
-    --sg:#1F7A6B; --sb:#2C49A4; --sa:#8A5A00; --so:#CC3D12; --sr:#B30838;
-    --pill-q-bg:#FDEBD3; --pill-q-tx:#8A5A00; --pill-w-bg:#E4EDF8; --pill-w-tx:#2C49A4;
-    --pill-n-bg:#F6E2E7; --pill-n-tx:#B30838;
-    --cond:"Knockout","Knockout 49 A","HelveticaNeue-CondensedBold","Helvetica Neue Condensed","Arial Narrow Bold","Arial Narrow",Impact,sans-serif;
-    --sans:"Helvetica Neue",Helvetica,Arial,-apple-system,BlinkMacSystemFont,sans-serif;
-    --editorial:"Adobe Garamond Pro",Garamond,"Iowan Old Style",Georgia,"Times New Roman",serif;
+    --bg:#F9F8F4; --panel:#FFFFFF; --ink:#16181B; --muted:#4E555E; --faint:#8A9098;
+    --hair:#E4E2DC; --line:#C8C5BD; --chrome:#F1EFE9; --tint:#E9EDFA;
+    --accent:#2447C5; --accent-ink:#1B3697; --accent-contrast:#FFFFFF;
+    --rule:#16181B;
+    --urgent:#B42318; --warn:#925C00; --ok:#1F7A5C; --star-on:#B07C00;
+    --act-bg:#16181B; --act-tx:#F9F8F4;
+    --trk-bg:#E9EDFA; --trk-tx:#1B3697;
+    --scn-tx:#4E555E;
+    --sh-1:0 1px 2px rgba(20,22,26,.05);
+    --sh-2:0 1px 2px rgba(20,22,26,.07),0 4px 12px rgba(20,22,26,.06);
+    --sh-3:0 1px 2px rgba(20,22,26,.08),0 4px 12px rgba(20,22,26,.07),0 16px 32px rgba(20,22,26,.06);
+    --sans:-apple-system,BlinkMacSystemFont,"Helvetica Neue","Segoe UI",Roboto,Arial,sans-serif;
+    --serif:Charter,"Iowan Old Style","Palatino Linotype",Georgia,Cambria,serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+    --e-out:cubic-bezier(.16,1,.3,1);
+    --t-1:130ms; --t-2:200ms; --t-3:280ms;
   }
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#14161A; --panel:#191C21; --ink:#ECEAE4; --muted:#A8ACB2; --faint:#7A8088;
+    --hair:#262A30; --line:#464C54; --chrome:#1E2228; --tint:#1D2436;
+    --accent:#8FA7F2; --accent-ink:#A9BCF5; --accent-contrast:#14161A;
+    --rule:#ECEAE4;
+    --urgent:#F2705F; --warn:#E0A84F; --ok:#57BE9A; --star-on:#E5B45C;
+    --act-bg:#ECEAE4; --act-tx:#14161A;
+    --trk-bg:#1D2436; --trk-tx:#A9BCF5;
+    --scn-tx:#A8ACB2;
+    --sh-1:0 1px 2px rgba(0,0,0,.4);
+    --sh-2:0 1px 2px rgba(0,0,0,.45),0 4px 12px rgba(0,0,0,.35);
+    --sh-3:0 1px 2px rgba(0,0,0,.5),0 4px 14px rgba(0,0,0,.4),0 16px 36px rgba(0,0,0,.35)}}
+  :root[data-theme="dark"]{
+    --bg:#14161A; --panel:#191C21; --ink:#ECEAE4; --muted:#A8ACB2; --faint:#7A8088;
+    --hair:#262A30; --line:#464C54; --chrome:#1E2228; --tint:#1D2436;
+    --accent:#8FA7F2; --accent-ink:#A9BCF5; --accent-contrast:#14161A;
+    --rule:#ECEAE4;
+    --urgent:#F2705F; --warn:#E0A84F; --ok:#57BE9A; --star-on:#E5B45C;
+    --act-bg:#ECEAE4; --act-tx:#14161A;
+    --trk-bg:#1D2436; --trk-tx:#A9BCF5;
+    --scn-tx:#A8ACB2;
+    --sh-1:0 1px 2px rgba(0,0,0,.4);
+    --sh-2:0 1px 2px rgba(0,0,0,.45),0 4px 12px rgba(0,0,0,.35);
+    --sh-3:0 1px 2px rgba(0,0,0,.5),0 4px 14px rgba(0,0,0,.4),0 16px 36px rgba(0,0,0,.35)}
+  :root[data-theme="light"]{
+    --bg:#F9F8F4; --panel:#FFFFFF; --ink:#16181B; --muted:#4E555E; --faint:#8A9098;
+    --hair:#E4E2DC; --line:#C8C5BD; --chrome:#F1EFE9; --tint:#E9EDFA;
+    --accent:#2447C5; --accent-ink:#1B3697; --accent-contrast:#FFFFFF;
+    --rule:#16181B;
+    --urgent:#B42318; --warn:#925C00; --ok:#1F7A5C; --star-on:#B07C00;
+    --act-bg:#16181B; --act-tx:#F9F8F4;
+    --trk-bg:#E9EDFA; --trk-tx:#1B3697;
+    --scn-tx:#4E555E;
+    --sh-1:0 1px 2px rgba(20,22,26,.05);
+    --sh-2:0 1px 2px rgba(20,22,26,.07),0 4px 12px rgba(20,22,26,.06);
+    --sh-3:0 1px 2px rgba(20,22,26,.08),0 4px 12px rgba(20,22,26,.07),0 16px 32px rgba(20,22,26,.06)}
+
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14.5px;line-height:1.5}
-  .wrap{max-width:1260px;margin:0 auto;padding:32px 22px 64px}
-  header{position:relative;border-bottom:3px solid var(--accent);padding:10px 0 14px 18px;margin-bottom:8px}
-  header::before{content:"";position:absolute;left:0;top:0;bottom:14px;width:2px;background:var(--crimson)}
-  header::after{content:"";position:absolute;left:8px;top:-6px;width:180px;height:1px;background:var(--sea)}
-  .eyebrow{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-  .eyebrow .of{font-family:var(--editorial);font-style:italic;text-transform:lowercase;letter-spacing:.06em}
-  h1{font-family:var(--cond);font-size:30px;font-weight:700;text-transform:uppercase;letter-spacing:.015em;color:var(--head);margin:0 0 6px;font-stretch:condensed}
-  h1 .slash{color:var(--crimson);font-weight:700}
-  .sub{color:var(--muted);font-size:13.5px}
-  .sub strong{color:var(--head)}
-  a.rubric{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--tint)}
-  .tagpill{display:inline-block;background:var(--tint);color:var(--accent);border-radius:11px;padding:2px 9px;font-size:12px;font-weight:600;vertical-align:middle}
-  .stats{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 16px}
-  .stat{border:1px solid var(--hair);border-top:3px solid var(--sea);border-radius:0 0 6px 6px;padding:9px 14px;min-width:92px;background:var(--card)}
-  .stat b{font-family:var(--cond);font-stretch:condensed;font-size:22px;display:block;line-height:1.1;color:var(--head)}
-  .stat span{color:var(--muted);font-size:12px}
-  .stat.s-o{border-top-color:var(--so)} .stat.s-a{border-top-color:var(--sa)}
-  .stat.s-b{border-top-color:var(--sb)} .stat.s-r{border-top-color:var(--sr)}
-  .stat.s-o b{color:var(--so)}.stat.s-a b{color:var(--sa)}.stat.s-b b{color:var(--sb)}.stat.s-r b{color:var(--sr)}
-  .tierbar{display:flex;gap:6px;margin:16px 0 4px}
-  .tierbar button{font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--muted);background:var(--bg);border:1px solid var(--hair);border-radius:8px;padding:5px 13px;cursor:pointer}
-  .tierbar button:hover{color:var(--accent);border-color:var(--accent)}
-  .tierbar button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .note{color:var(--muted);font-size:12.5px;margin:0 0 10px}
-  .legend{display:flex;flex-wrap:wrap;gap:14px;margin:0 0 16px;font-size:12px;color:var(--muted)}
-  .legend span{display:inline-flex;align-items:center;gap:5px}
-  .dot{width:10px;height:10px;border-radius:3px;display:inline-block}
-  .scroll{overflow-x:auto;border:1px solid var(--hair);border-radius:8px;background:var(--card)}
-  table{border-collapse:collapse;width:100%;min-width:1140px}
-  th,td{text-align:left;padding:8px 11px;border-bottom:1px solid var(--hair);vertical-align:top}
-  th{background:var(--head);color:#B9C6DB;font-family:var(--cond);font-stretch:condensed;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;white-space:nowrap;position:sticky;top:0}
-  th:hover{color:#fff}
-  tbody tr:hover{background:var(--tint)}
-  td.t{font-size:14px;font-weight:600;max-width:300px}
-  td.t a{color:var(--head);text-decoration:none;border-bottom:1px solid var(--hair)}
-  td.t a:hover{color:var(--accent);border-color:var(--accent)}
-  h2.sec{font-family:var(--cond);font-stretch:condensed;font-size:19px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--head);margin:26px 0 6px;border-left:2px solid var(--crimson);padding-left:10px}
-  .rec{display:inline-block;border-radius:11px;padding:2px 8px;font-size:11px;font-weight:700;white-space:nowrap}
-  /* Status semantics (brand-derived): teal=good · Pacific=monitor · amber=check · red-orange=act now · Crimson=stop.
-     Within any single scale (days) only teal/amber/Crimson appear; act-now is pill/tile-only, always labeled. */
-  .r-GO{background:#1F7A6B;color:#fff}
-  .r-HR{background:#CC3D12;color:#fff}
-  .r-QUALIFY{background:var(--pill-q-bg);color:var(--pill-q-tx)}
-  .r-WATCH{background:var(--pill-w-bg);color:var(--pill-w-tx)}
-  .r-NO_GO{background:var(--pill-n-bg);color:var(--pill-n-tx)}
-  .fit{font-family:var(--cond);font-stretch:condensed;font-weight:700}
-  .days{font-weight:600}
-  .un{color:var(--faint);font-style:italic}
-  .inst{font-size:12px;color:var(--muted)}
-  .sg{color:var(--sg);font-weight:600}
-  .sa{color:var(--sa);font-weight:600}
-  .sb{color:var(--sb);font-weight:600}
-  .sr{color:var(--sr);font-weight:700}
-  footer{color:var(--faint);font-size:12px;margin-top:20px;border-top:1px solid var(--hair);padding-top:12px}
-  @media (prefers-color-scheme:dark){
-    :root{--bg:#14243A;--ink:#E8ECF2;--head:#E8ECF2;--muted:#9FB0C7;--faint:#7C8BA3;
-      --accent:#8FB4E8;--crimson:#F26B7E;--sea:#4A6C9C;
-      --tint:#223655;--hair:#2C3D58;--chrome:#1B2C47;--card:#1B2C47;
-      --sg:#63C7B2;--sb:#8FB4E8;--sa:#FFAC5F;--so:#F2854B;--sr:#F26B7E;
-      --pill-q-bg:#3A2E15;--pill-q-tx:#FFAC5F;--pill-w-bg:#1F3050;--pill-w-tx:#8FB4E8;
-      --pill-n-bg:#43222B;--pill-n-tx:#F26B7E}
-    th{background:#0E1A2C;color:#9FB0C7}
-    th:hover{color:#E8ECF2}
-    .keyhead{background:#0E1A2C}
-    .tierbar button.on{color:#0E1A2C}
-    .r-GO{background:#1F7A6B}.r-HR{background:#CC3D12}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5;
+    -webkit-font-smoothing:antialiased}
+  button{font-family:var(--sans)}
+  .num{font-variant-numeric:tabular-nums}
+  ::selection{background:var(--tint);color:var(--accent-ink)}
+
+  /* ── Top utility bar ── */
+  .topbar{position:fixed;top:0;left:0;right:0;height:48px;background:var(--bg);
+    border-bottom:1px solid var(--hair);display:flex;align-items:center;gap:12px;padding:0 16px;z-index:40}
+  .brand{font-family:var(--mono);font-size:10.5px;font-weight:700;color:var(--ink);white-space:nowrap;
+    letter-spacing:.14em;text-transform:uppercase}
+  .brand .sub{font-family:var(--mono);color:var(--faint);font-weight:500;margin-left:8px;font-size:9.5px;
+    letter-spacing:.1em;text-transform:uppercase}
+  .search{flex:1;max-width:440px;position:relative}
+  .search input{width:100%;height:30px;border:1px solid var(--line);border-radius:0;background:var(--panel);color:var(--ink);
+    padding:0 60px 0 28px;font-size:13px;outline:none;transition:border-color var(--t-1) var(--e-out)}
+  .search input:focus{border-color:var(--accent)}
+  .search .ic{position:absolute;left:9px;top:6px;color:var(--faint);font-size:13px;pointer-events:none}
+  .search .kbd{position:absolute;right:7px;top:5px}
+  kbd{border:1px solid var(--hair);font-size:10px;color:var(--faint);padding:1px 5px;
+    background:var(--chrome);font-family:var(--mono)}
+  .topbar .spacer{flex:1}
+  .updated{font-family:var(--mono);font-size:10px;color:var(--faint);white-space:nowrap;letter-spacing:.03em}
+  .iconbtn{border:1px solid var(--hair);background:var(--panel);color:var(--muted);height:30px;
+    min-width:30px;padding:0 9px;cursor:pointer;font-size:13px;
+    transition:color var(--t-1) var(--e-out),border-color var(--t-1) var(--e-out),transform var(--t-1) var(--e-out)}
+  .iconbtn:hover{color:var(--accent-ink);border-color:var(--accent)}
+  .iconbtn:active{transform:scale(.96)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  /* ── Layout: sidebar left; windows band horizontal ── */
+  .layout{display:grid;grid-template-columns:216px minmax(0,1fr);
+    grid-template-areas:"side mast" "side rail" "side main";grid-template-rows:auto auto 1fr;
+    padding-top:48px;min-height:100vh}
+  .mast{grid-area:mast;padding:36px clamp(18px,3vw,34px) 24px}
+  .side{grid-area:side}
+  .rail{grid-area:rail}
+  .layout > main{grid-area:main}
+
+  /* ── Sidebar ── */
+  .side{border-right:1px solid var(--hair);background:var(--bg);padding:14px 10px 20px;position:sticky;top:48px;
+    height:calc(100vh - 48px);overflow-y:auto}
+  .navlbl{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--faint);margin:18px 8px 6px;
+    letter-spacing:.18em;text-transform:uppercase}
+  .nav{display:flex;flex-direction:column;gap:1px}
+  .nav button{display:flex;align-items:center;gap:8px;width:100%;text-align:left;border:0;background:none;color:var(--muted);
+    font-size:13px;font-weight:450;padding:6px 10px;cursor:pointer;min-height:28px;
+    transition:background var(--t-1) var(--e-out),color var(--t-1) var(--e-out)}
+  .nav button:hover{background:var(--chrome);color:var(--ink)}
+  .nav button:active{transform:scale(.985)}
+  .nav button.on{background:var(--tint);color:var(--accent-ink);font-weight:600;box-shadow:inset 2px 0 0 var(--accent)}
+  .nav .n{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--faint)}
+  .nav button.on .n{color:var(--accent-ink)}
+  .side .foot{margin-top:22px;padding:12px 8px;font-family:var(--mono);font-size:9px;color:var(--faint);
+    border-top:1px solid var(--hair);line-height:1.8;letter-spacing:.02em}
+  .side .foot a{color:var(--accent-ink);text-decoration:none}
+
+  /* ── Windows band ── */
+  .rail{border-bottom:1px solid var(--rule);background:var(--chrome);padding:12px clamp(18px,3vw,34px) 14px;
+    display:grid;grid-template-rows:auto auto;grid-auto-flow:column;grid-auto-columns:1fr;column-gap:48px;
+    position:static;height:auto;overflow:visible;border-left:0}
+  .rail h3{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--faint);margin:0 0 8px;
+    letter-spacing:.2em;text-transform:uppercase}
+  #windows{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0 18px}
+  .wline{display:flex;gap:12px;align-items:center;padding:5px 8px 7px 0;border-bottom:0;cursor:pointer;
+    transition:background var(--t-1) var(--e-out)}
+  .wline:hover{background:var(--tint)}
+  .wline .d{flex:none;text-align:left;min-width:38px}
+  .wline .d b{display:block;font-family:var(--mono);font-size:20px;line-height:1.05;font-weight:600;color:var(--accent-ink)}
+  .wline .d span{font-family:var(--mono);font-size:8px;color:var(--faint);letter-spacing:.08em;text-transform:uppercase}
+  .wline .t{font-size:11px;color:var(--muted);line-height:1.35}
+  .wline .t small{font-family:var(--mono);color:var(--faint);font-size:9px}
+  #pursuelist{display:flex;flex-direction:column;gap:2px}
+  #pursuelist .wline{padding:3px 8px 3px 0}
+  .railnote{font-size:10.5px;color:var(--faint);padding:2px 0}
+  .mobilestats{display:none}
+
+  /* ── Main: editorial column ── */
+  main{padding:22px clamp(18px,3vw,34px) 64px;min-width:0}
+  .m-eyebrow{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+  .m-eyebrow .m-scan{color:var(--accent-ink)}
+  .m-title{font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;
+    font-size:clamp(32px,4.4vw,54px);line-height:1.05;font-weight:700;
+    color:var(--ink);margin:16px 0 0}
+  .m-title em{font-style:italic;font-weight:400;color:var(--accent-ink)}
+
+  .verdict{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;background:none;border:0;
+    border-left:2px solid var(--ok);padding:4px 16px;margin:18px 0 22px}
+  .verdict.alert{border-left-color:var(--urgent)}
+  .verdict .lead{font-family:var(--serif);font-weight:700;font-size:16.5px;letter-spacing:-.01em}
+  .verdict.alert .lead{color:var(--urgent)}
+  .vchip{border:1px solid var(--hair);background:var(--bg);color:var(--muted);padding:3px 10px;
+    font-family:var(--mono);font-size:10px;cursor:pointer;min-height:24px;letter-spacing:.04em;
+    transition:border-color var(--t-1) var(--e-out),color var(--t-1) var(--e-out)}
+  .vchip:hover{border-color:var(--accent);color:var(--accent-ink)}
+  .vchip b{font-weight:700;color:var(--ink)}
+  .vchip .crit{color:var(--urgent);font-weight:700}
+  .vchip .warn{color:var(--warn);font-weight:700}
+  .verdict .gen{margin-left:auto;font-family:var(--mono);font-size:9.5px;color:var(--faint);letter-spacing:.06em;text-transform:uppercase}
+  .stale{background:color-mix(in srgb,var(--warn) 12%,var(--panel));border:1px solid color-mix(in srgb,var(--warn) 40%,var(--hair));
+    color:var(--warn);padding:9px 14px;font-size:12.5px;margin-bottom:12px;font-weight:600}
+
+  .viewhead{display:flex;align-items:baseline;gap:12px;margin:4px 0 2px;border-bottom:1px solid var(--rule);padding-bottom:10px}
+  .viewhead h1{font-family:var(--serif);font-size:26px;font-weight:700;letter-spacing:-.018em;color:var(--ink);margin:0}
+  .viewhead .count{font-family:var(--mono);font-size:11px;color:var(--accent-ink)}
+  .viewsub{font-family:var(--serif);color:var(--muted);font-size:13.5px;margin:8px 0 14px;max-width:64ch}
+
+  .group{margin:26px 0 2px}
+  .group button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;cursor:pointer;padding:6px 0;
+    min-height:28px;color:var(--muted);font-family:var(--mono);font-size:10px;font-weight:600;text-align:left;
+    letter-spacing:.16em;text-transform:uppercase}
+  .group .car{display:inline-block;transition:transform var(--t-2) var(--e-out);font-size:10px;color:var(--faint)}
+  .group.closed .car{transform:rotate(-90deg)}
+  .group .n{color:var(--accent-ink);font-weight:500;font-family:var(--mono)}
+  .group .rule{flex:1;height:1px;background:var(--hair)}
+
+  /* Rows: hairline-separated editorial entries on the paper ground */
+  .rows{background:none;border:0;border-top:1px solid var(--hair);box-shadow:none;overflow:visible;margin-top:6px}
+  .row{padding:13px 4px;cursor:pointer;position:relative;border-bottom:1px solid var(--hair);
+    transition:background var(--t-1) var(--e-out)}
+  .row + .row{border-top:0}
+  .row:hover{background:var(--chrome)}
+  .row.sel{background:var(--chrome);box-shadow:inset 2px 0 0 var(--accent)}
+  .row.dim{opacity:.5}
+  .row .l1{display:flex;align-items:baseline;gap:10px;min-width:0}
+  .row .title{font-family:var(--serif);font-size:15.5px;font-weight:600;letter-spacing:-.012em;color:var(--ink);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:80px;
+    transition:color var(--t-1) var(--e-out)}
+  .row:hover .title{color:var(--accent-ink)}
+  .row .title.unread-t{font-weight:800}
+  .row .l2{margin:4px 0 0 0;color:var(--muted);font-size:12.5px;line-height:1.55;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .row .meta{display:flex;align-items:baseline;gap:12px;flex:none}
+  .mtx{font-family:var(--mono);font-size:9.5px;color:var(--faint);white-space:nowrap;letter-spacing:.04em}
+  .impn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent-ink);min-width:22px;text-align:right}
+  .noteic{color:var(--faint);font-size:12px;flex:none}
+  .pill{display:inline-block;font-family:var(--mono);padding:2px 8px;font-size:9px;font-weight:700;
+    white-space:nowrap;flex:none;text-align:center;letter-spacing:.1em;text-transform:uppercase}
+  .p-GO{background:var(--ok);color:var(--accent-contrast)}
+  .p-HR{background:var(--act-bg);color:var(--act-tx)}
+  .p-QUALIFY{background:var(--trk-bg);color:var(--trk-tx)}
+  .p-WATCH{background:none;border:1px solid var(--line);color:var(--scn-tx);padding:1px 7px}
+  .p-NO_GO{background:none;border:1px solid var(--line);color:var(--faint);padding:1px 7px}
+  .tier{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--muted);flex:none;letter-spacing:.08em}
+  .tier-QUALIFY{color:var(--accent-ink)}
+  .chip{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--muted);background:var(--chrome);
+    border:1px solid var(--hair);padding:2px 7px;white-space:nowrap;flex:none;letter-spacing:.05em}
+  .badge-new{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--accent-ink);background:var(--tint);
+    padding:1px 6px;flex:none;letter-spacing:.08em;text-transform:uppercase}
+  .due{font-family:var(--mono);font-weight:700;font-size:10px;white-space:nowrap;letter-spacing:.03em}
+  .due.warn{color:var(--warn)} .due.crit{color:var(--urgent)} .due.ok{color:var(--muted);font-weight:450}
+  .unread{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;flex:none}
+  .starbtn{border:0;background:none;cursor:pointer;font-size:15px;color:var(--faint);padding:2px 4px;line-height:1;flex:none;
+    min-width:24px;min-height:24px;opacity:0;
+    transition:color var(--t-1) var(--e-out),transform var(--t-1) var(--e-out),opacity var(--t-1) var(--e-out)}
+  .row:hover .starbtn,.row:focus-within .starbtn,.starbtn.on{opacity:1}
+  @media (hover:none){.starbtn{opacity:1}}
+  .starbtn.on{color:var(--star-on)}
+  .starbtn:hover{color:var(--star-on);transform:scale(1.12)}
+  .starbtn:active{transform:scale(.9)}
+  .emptyview{padding:64px 20px;text-align:center;color:var(--faint);font-family:var(--mono);font-size:11px;
+    letter-spacing:.1em;text-transform:uppercase}
+
+  /* ── Hypothesis cards (Stream 2 — cultivation signals, not pursuable opps) ── */
+  .arch{background:var(--panel);border:1px solid var(--hair);box-shadow:var(--sh-1);padding:14px 16px 12px;margin:0 0 10px}
+  .archhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:0 0 2px}
+  .archhead .at{font-family:var(--serif);font-size:14.5px;font-weight:600;color:var(--ink);flex:1 1 240px;min-width:0}
+  .hypobody{font-family:var(--serif);font-size:13px;color:var(--muted);line-height:1.6;margin:6px 0 0}
+  .hypometa{display:grid;grid-template-columns:max-content 1fr;gap:3px 14px;font-size:11px;color:var(--muted);
+    margin-top:10px;border-top:1px solid var(--hair);padding-top:8px}
+  .hypometa .k{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--faint);letter-spacing:.14em;
+    text-transform:uppercase;padding-top:1px}
+  .hypometa .warncol{color:var(--warn);font-weight:600}
+  .archnote{font-family:var(--serif);font-size:13px;color:var(--faint);border-top:1px solid var(--hair);margin-top:14px;padding-top:10px}
+
+  /* entrance (first render only; cumulative stagger capped in JS) */
+  .entering .row{animation:rise var(--t-3) var(--e-out) both;animation-delay:var(--d,0ms)}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ── Detail: inline accordion panel ── */
+  .scrim{display:none}
+  .row.openrow{background:var(--chrome);box-shadow:inset 2px 0 0 var(--accent);border-bottom-color:transparent}
+  .row.openrow .title{white-space:normal}
+  .row.openrow .l2{display:none}
+  .panelbox{display:none;background:var(--panel);border:1px solid var(--rule);box-shadow:var(--sh-2);
+    margin:0 0 26px;flex-direction:column}
+  .panelbox.open{display:flex;animation:paneldrop var(--t-3) var(--e-out) both}
+  @keyframes paneldrop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+  .phead{padding:0;border-bottom:0;position:sticky;top:54px;z-index:6;height:0;overflow:visible}
+  .phead .prow{display:none}
+  .phead h2{display:none}
+  .phead .close{position:absolute;top:6px;right:12px;background:var(--panel);border:1px solid var(--line);
+    box-shadow:var(--sh-1)}
+  .pbody{padding:18px 22px 26px;overflow:visible;flex:none}
+  .kv dt{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--faint);margin-bottom:4px;
+    letter-spacing:.18em;text-transform:uppercase}
+  .kv dd{margin:0 0 14px;font-family:var(--sans);font-size:13.5px;color:var(--ink);overflow-wrap:anywhere}
+  .kv dd.angle{font-family:var(--serif);font-size:15.5px;font-style:italic;color:var(--ink);
+    border-left:2px solid var(--accent);padding-left:14px;line-height:1.6}
+  .warncol{color:var(--warn);font-weight:600}
+  .critcol{color:var(--urgent);font-weight:700}
+  .okcol{color:var(--ok);font-weight:600}
+  .impactbig{display:flex;align-items:center;gap:14px;margin:2px 44px 16px 0}
+  .impactbig .n{font-family:var(--mono);font-size:30px;font-weight:600;color:var(--accent-ink);line-height:1}
+  .impactbig .lb{font-family:var(--mono);font-size:8.5px;color:var(--faint);letter-spacing:.14em;text-transform:uppercase}
+  .impactbig .bar{flex:1;height:3px;background:var(--chrome);overflow:hidden}
+  .impactbig .bar i{display:block;height:100%;background:var(--accent)}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 16px}
+  .btn{display:inline-flex;align-items:center;border:1px solid var(--line);background:none;color:var(--muted);
+    padding:8px 14px;font-family:var(--mono);font-size:10px;font-weight:600;cursor:pointer;text-decoration:none;
+    min-height:32px;letter-spacing:.08em;text-transform:uppercase;
+    transition:all var(--t-1) var(--e-out)}
+  .btn:hover{color:var(--accent-ink);border-color:var(--accent-ink)}
+  .btn:active{transform:scale(.97)}
+  .btn.primary{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+  .btn.primary:hover{background:var(--accent-ink);border-color:var(--accent-ink);color:var(--accent-contrast)}
+  .notebox{width:100%;min-height:64px;border:1px solid var(--line);background:var(--panel);color:var(--ink);
+    padding:8px 10px;font-family:var(--sans);font-size:13px;resize:vertical}
+  .notebox:focus{border-color:var(--accent);outline:none}
+  .attrib{font-size:11px;color:var(--faint);margin-top:4px}
+  .verified{font-size:11px;color:var(--faint);margin-top:10px}
+  .verified a{color:var(--accent-ink)}
+
+  /* ── Toast ── */
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(8px);background:var(--ink);color:var(--bg);
+    padding:10px 16px;font-size:13px;z-index:90;display:flex;gap:14px;align-items:center;
+    opacity:0;pointer-events:none;transition:opacity var(--t-2) var(--e-out),transform var(--t-2) var(--e-out);box-shadow:var(--sh-3)}
+  .toast.show{opacity:1;transform:translateX(-50%);pointer-events:auto}
+  .toast button{border:0;background:none;color:inherit;font-weight:700;cursor:pointer;font-size:13px;text-decoration:underline}
+
+  /* ── Command palette ── */
+  .palscrim{position:fixed;inset:0;background:rgba(20,22,26,.3);z-index:80;display:none;align-items:flex-start;
+    justify-content:center;padding-top:12vh;backdrop-filter:blur(2px)}
+  .palscrim.open{display:flex}
+  .pal{background:var(--bg);border:1px solid var(--rule);box-shadow:var(--sh-3);width:min(560px,92vw);overflow:hidden}
+  .pal input{width:100%;border:0;border-bottom:1px solid var(--hair);background:none;color:var(--ink);padding:14px 16px;
+    font-size:14px;outline:none;font-family:var(--sans)}
+  .pal .list{max-height:320px;overflow-y:auto;padding:6px}
+  .pal .it{display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;font-size:13px;color:var(--ink)}
+  .pal .it .k{color:var(--faint);font-family:var(--mono);font-size:10px;margin-left:auto;flex:none;letter-spacing:.06em}
+  .pal .it.sel{background:var(--tint);color:var(--accent-ink)}
+  .pal .none{padding:14px;color:var(--faint);font-size:13px}
+
+  /* ── Help modal ── */
+  .modal-scrim{position:fixed;inset:0;background:rgba(20,22,26,.35);z-index:85;display:none;align-items:flex-start;
+    justify-content:center;overflow-y:auto;padding:40px 14px}
+  .modal-scrim.open{display:flex}
+  .modal{background:var(--bg);border:1px solid var(--rule);box-shadow:var(--sh-3);max-width:560px;width:100%;
+    padding:24px 26px 28px;position:relative}
+  .modal h2{font-family:var(--serif);font-size:20px;font-weight:700;color:var(--ink);margin:0 0 4px;letter-spacing:-.015em}
+  .modal h3{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--ink);margin:20px 0 6px;
+    letter-spacing:.16em;text-transform:uppercase}
+  .modal p,.modal li{font-family:var(--serif);font-size:13.5px;color:var(--muted);line-height:1.6;margin:6px 0}
+  .modal ol,.modal ul{padding-left:20px;margin:6px 0}
+  .modal .close{position:absolute;top:12px;right:14px}
+  .modal input[type=text],.modal input[type=password]{width:100%;height:34px;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink);padding:0 10px;font-size:13px;margin:2px 0 8px}
+  .modal input:focus{border-color:var(--accent);outline:none}
+  .modal .warn{background:color-mix(in srgb,var(--warn) 12%,var(--panel));color:var(--warn);padding:9px 12px;font-size:12px;margin:10px 0}
+  .modal label{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--faint);letter-spacing:.14em;text-transform:uppercase}
+  .modal code{background:var(--chrome);padding:1px 5px;font-size:12px;font-family:var(--mono)}
+  .modal .keys{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:12.5px;color:var(--muted);margin:8px 0}
+  .modal .tog{display:flex;align-items:center;gap:8px;margin:10px 0;font-size:13px;color:var(--ink)}
+  .tbtns{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px}
+  .syncchip{font-family:var(--mono);font-size:10px;font-weight:600;white-space:nowrap;letter-spacing:.03em}
+  .syncchip .st-ok{color:var(--ok)} .syncchip .st-warn{color:var(--warn)} .syncchip .st-err{color:var(--urgent)}
+
+  /* ── Responsive ── */
+  .menubtn{display:none}
+  @media (max-width:1100px){
+    .rail{grid-auto-flow:row;grid-template-rows:auto;row-gap:10px}
+    #windows{grid-template-columns:1fr 1fr}
   }
-  :root[data-theme="dark"]{--bg:#14243A;--ink:#E8ECF2;--head:#E8ECF2;--muted:#9FB0C7;--faint:#7C8BA3;
-    --accent:#8FB4E8;--crimson:#F26B7E;--sea:#4A6C9C;
-    --tint:#223655;--hair:#2C3D58;--chrome:#1B2C47;--card:#1B2C47;
-    --sg:#63C7B2;--sb:#8FB4E8;--sa:#FFAC5F;--so:#F2854B;--sr:#F26B7E;
-    --pill-q-bg:#3A2E15;--pill-q-tx:#FFAC5F;--pill-w-bg:#1F3050;--pill-w-tx:#8FB4E8;
-    --pill-n-bg:#43222B;--pill-n-tx:#F26B7E}
-  :root[data-theme="dark"] th{background:#0E1A2C;color:#9FB0C7}
-  :root[data-theme="dark"] .keyhead{background:#0E1A2C}
-  :root[data-theme="dark"] .tierbar button.on{color:#0E1A2C}
-  :root[data-theme="light"]{--bg:#FFFFFF;--ink:#23272E;--head:#1D3557;--muted:#5A6472;--faint:#8A93A0;
-    --accent:#2C49A4;--crimson:#B30838;--sea:#6D97C9;
-    --tint:#E9EEF9;--hair:#E3E6EB;--chrome:#F1F3F6;--card:#FFFFFF;
-    --sg:#1F7A6B;--sb:#2C49A4;--sa:#8A5A00;--so:#CC3D12;--sr:#B30838;
-    --pill-q-bg:#FDEBD3;--pill-q-tx:#8A5A00;--pill-w-bg:#E4EDF8;--pill-w-tx:#2C49A4;
-    --pill-n-bg:#F6E2E7;--pill-n-tx:#B30838}
-
-  /* Iteration 2026-08-04: evidence-aligned table mechanics (see digest/Bear research report) */
+  @media (max-width:760px){
+    .layout{grid-template-columns:minmax(0,1fr);grid-template-areas:"mast" "rail" "main"}
+    .side{position:fixed;left:0;top:48px;bottom:0;width:232px;z-index:50;transform:translateX(-105%);
+      transition:transform var(--t-2) var(--e-out);box-shadow:var(--sh-3);background:var(--bg);
+      height:calc(100vh - 48px);grid-area:auto}
+    .side.open{transform:none}
+    .menubtn{display:inline-block}
+    .brand .sub{display:none}
+    .updated{display:none}
+    .row .title{white-space:normal}
+    .m-title{font-size:clamp(30px,8vw,44px)}
+    #windows{grid-template-columns:1fr}
+  }
+  @media (max-width:600px){
+    .brand{display:none}
+    main{padding:20px 14px 60px}
+    .row .l1{flex-wrap:wrap}
+    .row .meta{margin-left:auto}
+    .search input{min-width:80px}
+  }
   .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-  .num{text-align:right;font-variant-numeric:tabular-nums}
-  thead th:first-child{left:0;z-index:3}
-  th.num{text-align:right}
-  td.t{position:sticky;left:0;z-index:1;background:var(--card);box-shadow:1px 0 0 var(--hair)}
-  tr.alt td{background:var(--row-alt)}
-  tr.alt td.t{background:var(--row-alt)}
-  tbody tr:hover td{background:var(--tint)}
-  tbody tr.detail td{background:var(--chrome);color:var(--muted);font-size:12.5px;padding:6px 11px 10px 34px;border-bottom:1px solid var(--hair)}
-  tbody tr.detail:hover td{background:var(--chrome)}
-  .exp{border:1px solid var(--hair);background:var(--card);color:var(--muted);border-radius:4px;width:20px;height:20px;line-height:1;cursor:pointer;margin-right:6px;font-size:10px;vertical-align:middle;padding:0}
-  .exp:hover{color:var(--accent);border-color:var(--accent)}
-  .exp[aria-expanded="true"]{color:var(--accent)}
-  .glyph{margin-right:4px;font-size:9px}
-  th .thbtn{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:4px;font:inherit;color:inherit}
-  th .thbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  .si{font-size:9px;opacity:.45}
-  th[aria-sort] .si{opacity:1}
-  th[aria-sort]{color:#fff}
-  .toggle-nogo{margin-left:auto;font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--muted);background:var(--bg);border:1px solid var(--hair);border-radius:8px;padding:5px 13px;cursor:pointer}
-  .toggle-nogo:hover{color:var(--accent);border-color:var(--accent)}
-  .toggle-nogo[aria-pressed="true"]{background:var(--tint);color:var(--accent);border-color:var(--accent)}
-  .delta{display:block;font-size:11px;color:var(--faint);margin-top:2px}
-  :root{--row-alt:#F6F8FA}
-  @media (prefers-color-scheme:dark){:root{--row-alt:#182948}}
-  :root[data-theme="dark"]{--row-alt:#182948}
-  :root[data-theme="light"]{--row-alt:#F6F8FA}
 
-  /* Formatting pass 2 (operator-directed): structured meta, fixed tile grid, key box, row descriptions */
-  .meta{display:grid;grid-template-columns:max-content 1fr;gap:3px 16px;margin-top:4px;font-size:13px;color:var(--muted)}
-  .mlabel{font-family:var(--cond);font-stretch:condensed;font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);padding-top:2px}
-  .meta strong{color:var(--head)}
-  .stats{display:grid;grid-template-columns:repeat(3,minmax(220px,1fr));gap:10px;margin:18px 0 16px}
-  .stat{min-height:74px}
-  .keybox{border:1px solid var(--hair);border-radius:8px;overflow:hidden;margin:0 0 16px}
-  .keyhead{background:#1D3557;color:#fff;font-family:var(--cond);font-stretch:condensed;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:6px 14px}
-  .keygrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;background:var(--card)}
-  .keycol{padding:10px 14px;border-left:1px solid var(--hair);font-size:12.5px;color:var(--muted)}
-  .keycol:first-child{border-left:none}
-  .keytitle{font-family:var(--cond);font-stretch:condensed;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--head);margin-bottom:6px}
-  .keyrow{display:flex;align-items:baseline;gap:7px;margin:3px 0}
-  .keyrow .dot{flex:none;position:relative;top:1px}
-  .keyrow b{color:var(--ink);font-weight:600}
-  .desc{color:var(--muted);font-size:12px;font-weight:400;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin:3px 0 0 26px}
-  td.t{min-width:300px;max-width:340px}
-  .hypo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0}
-  .hypo{border:1px solid var(--hair);border-top:3px solid var(--sea);border-radius:0 0 6px 6px;background:var(--card);padding:10px 14px;font-size:12.5px;color:var(--muted)}
-  .hypo-t{font-size:13px;font-weight:700;color:var(--head);margin-bottom:5px;line-height:1.3}
-  .hypo-b{line-height:1.45;margin-bottom:8px}
-  .hypo-meta{display:grid;grid-template-columns:max-content 1fr;gap:2px 10px;border-top:1px solid var(--hair);padding-top:7px}
-  footer{display:grid;grid-template-columns:max-content 1fr;gap:4px 16px}
-  @media (max-width:900px){.stats,.keygrid,.hypo-grid{grid-template-columns:1fr}.keycol{border-left:none;border-top:1px solid var(--hair)}}
+  /* ── Reduced motion: remove, don't fade ── */
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation:none !important;transition:none !important}
+    .entering .row{animation:none !important}
+  }
+
+  /* ── Print: monochrome briefing (theme vars reset so dark mode prints light) ── */
+  @media print{
+    :root,:root[data-theme="dark"],:root[data-theme="light"]{
+      --bg:#fff; --panel:#fff; --ink:#000; --muted:#333; --faint:#555;
+      --hair:#999; --line:#999; --chrome:#eee; --tint:#eee;
+      --accent:#000; --accent-ink:#000; --accent-contrast:#fff; --rule:#000;
+      --urgent:#000; --warn:#000; --ok:#000;
+      --act-bg:#000; --act-tx:#fff; --trk-bg:#eee; --trk-tx:#000; --scn-tx:#333;
+      --sh-1:none; --sh-2:none; --sh-3:none}
+    .topbar,.side,.rail,.scrim,.panelbox,.toast,.palscrim,.modal-scrim,.mobilestats,.search,
+    .starbtn,.unread,.mast{display:none !important}
+    .layout{display:block;padding-top:0}
+    main{padding:0}
+    body{background:#fff;color:#000;font-size:11.5pt}
+    .verdict,.row,.arch{box-shadow:none;border:1px solid #999;break-inside:avoid}
+    .row .l2{-webkit-line-clamp:unset;display:block}
+    .pill,.chip{border:1px solid #666;background:none !important;color:#000 !important}
+    .due.crit::after{content:" (URGENT)"}
+    .due.warn::after{content:" (due soon)"}
+    a::after{content:""}
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="eyebrow">Relay Graduate School <span class="of">of</span> Education</div>
-    <h1>Public Funding <span class="slash">/</span> Opportunity Dashboard</h1>
-    <div class="meta">
-      <span class="mlabel">Last run</span><span><strong>2026-08-04</strong> · weekly cadence</span>
-      <span class="mlabel">Coverage</span><span><strong>Federal</strong> grants.gov + Federal Register · <strong>State</strong> NY · NJ · CT · IL · IN · TX · TN · <strong>District</strong> Ionwave (Houston / Fort Worth / Aldine / DeKalb) · NYC City Record · JMCSS</span>
-      <span class="mlabel">Delivery</span><span><span class="tagpill">Work/Relay/PublicFunding</span> &nbsp;·&nbsp; <a class="rubric" href="rubric.html">scoring rubric</a> <span style="color:var(--faint)">(<a class="rubric" href="config/scoring.yaml">raw yaml</a>)</span></span>
-    </div>
-  </header>
 
-  <div class="tierbar" id="tierbar">
-    <button data-tier="all" class="on">All</button>
-    <button data-tier="federal">Federal</button>
-    <button data-tier="state">State</button>
-    <button data-tier="district">District</button>
-    <button class="toggle-nogo" id="nogoBtn" aria-pressed="false"></button>
+<header class="topbar">
+  <button class="iconbtn menubtn" id="menubtn" aria-label="Menu">☰</button>
+  <div class="brand">Public Funding<span class="sub">Relay · grants &amp; contracts</span></div>
+  <div class="search">
+    <span class="ic">⌕</span>
+    <input id="q" type="search" placeholder="Search opportunities, funders, programs…" aria-label="Search items">
+    <span class="kbd"><kbd>/</kbd></span>
+  </div>
+  <div class="spacer"></div>
+  <span class="updated num" id="updated"></span>
+  <button class="iconbtn syncchip" id="syncchip" aria-haspopup="dialog" title="Team sync — click for setup &amp; help">…</button>
+  <button class="iconbtn" id="helpbtn" aria-haspopup="dialog" aria-label="Help and shortcuts" title="Help &amp; shortcuts (?)">?</button>
+  <button class="iconbtn" id="themebtn" aria-label="Toggle theme">◐</button>
+</header>
+
+<div class="layout" id="layout">
+  <nav class="side" id="side" aria-label="Views and filters">
+    <div class="navlbl">Views</div>
+    <div class="nav" id="viewnav"></div>
+    <div class="navlbl">Instrument</div>
+    <div class="nav" id="clsnav"></div>
+    <div class="navlbl">Tier</div>
+    <div class="nav" id="jurnav"></div>
+    <div class="foot">
+      Weekly scan · federal + 7 states + district routes<br>
+      <a href="rubric.html">Scoring rubric</a> · <a href="config/scoring.yaml">raw yaml</a><br>
+      tag <b>Work/Relay/PublicFunding</b><br>
+      Sibling: Calenhad (policy watch)
+    </div>
+  </nav>
+
+  <div class="mast">
+    <div class="m-eyebrow"><span>Relay Graduate School of Education</span><span class="m-scan">Weekly scan</span></div>
+    <h1 class="m-title">Public Funding</h1>
   </div>
 
-  <div class="stats">
-    <div class="stat"><b>0+2</b><span>candidates (8/04: 0 pipeline · 2 manual IL finds)<em class="delta">prior run 7/30: 8 (6 new · 2 amended)</em></span></div>
-    <div class="stat s-r"><b>2</b><span>screened out (new/changed)<em class="delta">prior run: 8 · all-time: 119 tracked</em></span></div>
-    <div class="stat s-b"><b>3</b><span>partnership hypotheses (standing; 0 new)</span></div>
-    <div class="stat s-a"><b>2</b><span>district QUALIFY (standing)</span></div>
-    <div class="stat s-o"><b>Aug 25</b><span>Noyce close · 15 bd</span></div>
-    <div class="stat s-o"><b>Sep 30</b><span>Houston RFP close · ~41 bd</span></div>
-  </div>
+  <main>
+    <div id="stalebox"></div>
+    <div id="verdict"></div>
+    <div class="mobilestats" id="mobilestats"></div>
+    <div class="viewhead"><h1 id="vtitle">Feed</h1><span class="count num" id="vcount"></span></div>
+    <p class="viewsub" id="vsub"></p>
+    <div id="feed"></div>
+  </main>
 
-  <div class="keybox">
-    <div class="keyhead">Key</div>
-    <div class="keygrid">
-      <div class="keycol">
-        <div class="keytitle">Color = attention</div>
-        <div class="keyrow"><span>plain text</span><span><b>normal / on track</b>: color is reserved for exceptions</span></div>
-        <div class="keyrow"><i class="dot" style="background:var(--sa)"></i><span><b>check</b>: deadline ≤15 bd, or a caution flag</span></div>
-        <div class="keyrow"><i class="dot" style="background:var(--sr)"></i><span><b>urgent / stop</b>: deadline ≤5 bd, or disqualified</span></div>
-        <div class="keyrow"><i class="dot" style="background:var(--sb)"></i><span><b>monitor</b></span></div>
-        <div class="keyrow"><i class="dot" style="background:var(--sg)"></i><span><b>good / GO</b></span></div>
-      </div>
-      <div class="keycol">
-        <div class="keytitle">Decision signals</div>
-        <div class="keyrow"><span><b>Fit</b></span><span>0–100 weighted rubric score</span></div>
-        <div class="keyrow"><span><b>Elig</b></span><span>eligibility confidence (High / Med / Low / No)</span></div>
-        <div class="keyrow"><span><b>Net</b></span><span>money that actually reaches Relay · ⚠ = scholarship pass-through</span></div>
-        <div class="keyrow"><span><b>Inst</b></span><span>funding instrument (grant / contract / co-op)</span></div>
-        <div class="keyrow"><span><b>Days</b></span><span>business days to close</span></div>
-      </div>
-      <div class="keycol">
-        <div class="keytitle">Using the table</div>
-        <div class="keyrow"><span>▸</span><span>expands a row's full summary</span></div>
-        <div class="keyrow"><span>▲▼</span><span>column headers sort</span></div>
-        <div class="keyrow"><span>✕</span><span>NO-GO rows hidden by default; toggle shows the audit trail</span></div>
-        <div class="keyrow"><span>✓</span><span>amounts, deadlines & eligibility verified from primary sources on the run date</span></div>
-      </div>
-    </div>
-  </div>
+  <aside class="rail" aria-label="Closing windows and pursue-next list">
+    <h3>Closing windows</h3>
+    <div id="windows"></div>
+    <h3>Pursue next</h3>
+    <div id="pursuelist"></div>
+  </aside>
+</div>
 
-  <div class="scroll">
-    <table id="tbl">
-      <caption class="sr-only">Relay public funding opportunities: recommendation, deadlines, and decision signals. Sortable columns.</caption>
-      <thead><tr>
-        <th data-k="title">Opportunity</th>
-        <th data-k="recRank">Rec</th>
-        <th data-k="days" class="num">Days</th>
-        <th data-k="close">Close</th>
-        <th data-k="path">Next step</th>
-        <th data-k="fit" class="num">Fit</th>
-        <th data-k="elig">Elig</th>
-        <th data-k="net">Net-to-Relay</th>
-        <th data-k="inst">Inst</th>
-        <th data-k="effort">Effort</th>
-        <th data-k="source">Source</th>
-      </tr></thead>
-      <tbody></tbody>
-    </table>
+<div class="scrim" id="scrim"></div>
+<section class="panelbox" id="panel" role="dialog" aria-labelledby="ptitle" inert>
+  <div class="phead">
+    <div class="prow" id="ppills"></div>
+    <h2 id="ptitle"></h2>
+    <button class="iconbtn close" id="pclose" aria-label="Close">✕</button>
   </div>
-  <div class="sr-only" aria-live="polite" id="sortAnnounce"></div>
+  <div class="pbody" id="pbody"></div>
+</section>
 
-  <h2 class="sec">Partnership hypotheses (Stream 2): cultivation signals, not pursuable opportunities</h2>
-  <div class="hypo-grid">
-    <div class="hypo">
-      <div class="hypo-t">CT · Sheff Reformulation → Hartford PS / CREC</div>
-      <div class="hypo-b">Operators select their own vendors and teacher recruitment is a required progress metric. Relay's role: PD / residency / certification vendor under an operator's plan; CREC also opens the CT RESC co-op path.</div>
-      <div class="hypo-meta">
-        <span class="mlabel">Signal</span><span>CSDE RFP 867, FY27–29 rolling</span>
-        <span class="mlabel">Cultivate by</span><span class="sa">2026-12-31</span>
-        <span class="mlabel">Owner</span><span>none (cold) · standing since 07-14</span>
-      </div>
-    </div>
-    <div class="hypo">
-      <div class="hypo-t">NY · NYC DOE alt-cert follow-on RFP</div>
-      <div class="hypo-b">Follow-on RFP expected from closed RFI I1869040. Cultivate NYCDOE OTRQ, register finance360, and monitor PASSPort / City Record for the posting.</div>
-      <div class="hypo-meta">
-        <span class="mlabel">Signal</span><span>RFI I1869040 (closed 1/23/26)</span>
-        <span class="mlabel">Window</span><span class="sa">H2 2026 · open now</span>
-        <span class="mlabel">Owner</span><span>none · standing since 07-08</span>
-      </div>
-    </div>
-    <div class="hypo">
-      <div class="hypo-t">NY · NYSED Title I 1003 SIG (Innovation) → NYC DOE</div>
-      <div class="hypo-b">Bronx D7 PS/IS 224 + D12 Bronx Career &amp; College Prep HS, $200k each, SY 2026-27, no carryover. Instructional-coaching / PD consultant spend explicitly allowable (FS-10 Code 40); Relay's role is PD/coaching vendor to awarded schools — selling window is early fall.</div>
-      <div class="hypo-meta">
-        <span class="mlabel">Signal</span><span>districts apply by 8/15/2026</span>
-        <span class="mlabel">Cultivate by</span><span class="sa">2026-09-15 (~30 bd)</span>
-        <span class="mlabel">Owner</span><span>none (cold) · added 07-24</span>
-      </div>
-    </div>
+<div class="toast" id="toast" role="status"></div>
+<div class="sr-only" aria-live="polite" id="announce"></div>
+
+<div class="palscrim" id="palscrim">
+  <div class="pal" role="dialog" aria-modal="true" aria-label="Command palette">
+    <input id="palq" placeholder="Type a view, tier, instrument, or opportunity…" aria-label="Command palette search">
+    <div class="list" id="pallist" role="listbox"></div>
   </div>
+</div>
 
-  <footer>
-    <span class="mlabel">Pipeline</span><span>Phase 1 federal · Phase 2 state scrapers (NY·NJ·CT·IL·IN·TX·TN) · Phase C district tier: Ionwave listings (Houston · Fort Worth · Aldine · DeKalb GA), NYC City Record (Socrata), JMCSS CivicEngage. District records score on the vendor path + procurement hard-gates (<a class="rubric" href="rubric.html">scoring rubric</a>).</span>
-    <span class="mlabel">Deferred</span><span>Headless district routes (Bonfire · OpenGov · BidNet · OMNIA/TIPS · Oracle iSupplier · DC OCP · GA GPR); see <code>docs/district-subscriptions.md</code>; email-only state feeds in <code>docs/state-subscriptions.md</code>; private-foundation / IRS-990 mining.</span>
-    <span class="mlabel">Provenance</span><span>Generated by <code>/relay-grants</code> · screened-out items kept for the audit trail · fixture-disproven DE bidcondocs + MNPS routes logged.</span>
-  </footer>
+<div class="modal-scrim" id="helpscrim">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="helptitle">
+    <button class="iconbtn close" id="helpclose" aria-label="Close">✕</button>
+    <h2 id="helptitle">Help — reading the board, shortcuts &amp; team sync</h2>
+
+    <h3>Reading the board</h3>
+    <ul>
+      <li><b>Go / Review</b> — pursue now, or a human call is needed. <b>Qualify</b> — worth pursuing once a named unknown is resolved. <b>Watch</b> — monitor only. <b>Screened out</b> — kept as the audit trail, collapsed by default.</li>
+      <li><b>Fit</b> is the 0–100 weighted rubric score. Color marks exceptions only: amber ≤15 business days to close (or a caution flag), red ≤5 (or disqualified). Normal states stay plain ink.</li>
+      <li><b>Net-to-Relay</b> flags money that never reaches Relay — ⚠ marks scholarship pass-throughs.</li>
+      <li>Amounts, deadlines and eligibility are verified from primary sources on the run date; anything unverified is labeled.</li>
+    </ul>
+
+    <h3>Coverage &amp; pipeline</h3>
+    <p><b>Federal</b> grants.gov + Federal Register · <b>State</b> NY · NJ · CT · IL · IN · TX · TN · <b>District</b> Ionwave (Houston / Fort Worth / Aldine / DeKalb), NYC City Record, JMCSS CivicEngage. District records score on the vendor path + procurement hard-gates (<a href="rubric.html">scoring rubric</a>).</p>
+    <p>Deferred: headless district routes (Bonfire · OpenGov · BidNet · OMNIA/TIPS · Oracle iSupplier · DC OCP · GA GPR), email-only state feeds, private-foundation / IRS-990 mining. Generated by <code>/relay-grants</code>; screened-out items are kept for the audit trail.</p>
+
+    <h3>Keyboard shortcuts</h3>
+    <div class="keys">
+      <span><kbd>↑</kbd> <kbd>↓</kbd> (or <kbd>J</kbd>/<kbd>K</kbd>)</span><span>Move through items</span>
+      <span><kbd>Enter</kbd></span><span>Open selected item</span>
+      <span><kbd>S</kbd></span><span>Star selected item</span>
+      <span><kbd>D</kbd></span><span>Dismiss selected item (undoable)</span>
+      <span><kbd>E</kbd></span><span>Restore selected dismissed item</span>
+      <span><kbd>/</kbd></span><span>Search</span>
+      <span><kbd>⌘K</kbd> / <kbd>Ctrl K</kbd></span><span>Command palette</span>
+      <span><kbd>Esc</kbd></span><span>Close panels</span>
+      <span><kbd>?</kbd></span><span>This help</span>
+    </div>
+    <div class="tog">
+      <input type="checkbox" id="keystoggle" checked>
+      <label for="keystoggle" style="font-size:13px;color:var(--ink)">Enable single-letter shortcuts (S, D, E, J, K, /, ?)</label>
+    </div>
+    <p>Arrow keys, Tab, Enter and Escape always work. Single-letter shortcuts only act on the selected item and never fire while you're typing.</p>
+
+    <h3>Team sync — how it works</h3>
+    <p>Stars <span style="color:#D99A06">★</span>, notes, and dismissals are <b>shared with the whole team</b>. They're stored in a small file that lives alongside this page on GitHub — no separate account or app. (What you've <i>read</i> is personal and stays on your own computer.)</p>
+    <p><b>Just browsing?</b> Nothing to set up. You already see the team's stars and notes.</p>
+    <p><b>Want your changes to save for the whole team?</b> You need a one-time "save key" from GitHub (free account required). It takes about two minutes:</p>
+    <ol>
+      <li>Sign in at <b>github.com</b>, click your photo (top-right) → <b>Settings</b>.</li>
+      <li><b>Developer settings</b> → <b>Personal access tokens</b> → <b>Fine-grained tokens</b> → <b>Generate new token</b>.</li>
+      <li>Name it <code>Funding Dashboard</code>, set expiration to 90 days (you'll repeat this when it expires).</li>
+      <li><b>Repository access</b>: <b>Only select repositories</b> → <code>relay-funding-dashboard</code>.</li>
+      <li><b>Permissions → Repository permissions</b>: <b>Contents: Read and write</b>. Nothing else.</li>
+      <li>Generate, copy the <code>github_pat_…</code> code, paste it below with your name, Save.</li>
+    </ol>
+    <div class="warn">This dashboard's GitHub home is public, so notes are visible to anyone who finds it — keep them operational ("we should register for this"), never confidential. Your save key stays in this browser only and can only touch this one dashboard.</div>
+    <label for="whoin">Your name (shown next to your notes)</label>
+    <input type="text" id="whoin" placeholder="e.g. Cliff">
+    <label for="tokin">Save key (github_pat_…)</label>
+    <input type="password" id="tokin" placeholder="paste your save key here" autocomplete="off">
+    <div class="tbtns">
+      <button class="btn primary" id="savesettings">Save</button>
+      <button class="btn" id="syncnowbtn">Sync now</button>
+      <button class="btn" id="exportbtn">Copy my unsaved changes</button>
+      <button class="btn" id="cleartok">Forget key</button>
+    </div>
+    <p class="attrib" id="settingsmsg"></p>
+  </div>
 </div>
 
 <script>
-const RANK={HR:0,QUALIFY:1,WATCH:2,NO_GO:3};
-const REC_LABEL={HR:"HUMAN REVIEW",QUALIFY:"QUALIFY",WATCH:"WATCH",NO_GO:"NO-GO",GO:"GO"};
-const REC_GLYPH={HR:"\u25b2",QUALIFY:"\u25c6",WATCH:"\u25cb",NO_GO:"\u2715",GO:"\u25cf"};
+// ── DATA is edited in place by each /relay-grants run — never rebuild this page. ──
+// Row schema: {rec:GO|HR|QUALIFY|WATCH|NO_GO, fit:0-100|null, elig, eligWarn, inst, net, netWarn,
+//   close:"...", days:int|null (business days), effort, path:"next step", title, url, source,
+//   summary, tier:"federal"|"state"|"district" (federal inferred from source when absent),
+//   status:"NEW"|"UPDATED" (optional, per-run)}
 const GG="https://www.grants.gov/search-results-detail/";
 const FR="https://www.federalregister.gov/documents/";
 const DATA=[
- // Days (business days) recalculated from 2026-08-04. Nothing past deadline this run; TN dining (8/5), Djibouti (8/6), DOS Empowering (8/7), DOS Mentor (8/9), OSEP (8/10) drop next run.
- {rec:"QUALIFY",fit:66,elig:"Low",eligWarn:true,inst:"scholarship pass-through",net:"pass-through ⚠",netWarn:true,close:"Aug 25, 2026",days:15,effort:"Very High",path:"ask elig / find partner",title:"Robert Noyce Teacher Scholarship (47.076)",url:GG+"348012",source:"grants.gov",summary:"NSF scholarships to recruit STEM majors into teaching. Headline $3.25M is mostly student scholarships — low net to Relay; likely needs a STEM prime."},
+ // Days (business days) recalculated from 2026-08-11. Dropped past-deadline this run: OSEP (8/10), DOS Mentor (8/9), DOS Empowering (8/7), DOS Djibouti (8/6), TN dining (8/5), IL After School (8/6); also screened-and-closed TX ESBD cloud (8/7) and Workforce Forum (awarded) were never added.
+ {rec:"QUALIFY",fit:66,elig:"Low",eligWarn:true,inst:"scholarship pass-through",net:"pass-through ⚠",netWarn:true,close:"Aug 25, 2026",days:10,effort:"Very High",path:"ask elig / find partner",title:"Robert Noyce Teacher Scholarship (47.076)",url:GG+"348012",source:"grants.gov",summary:"NSF scholarships to recruit STEM majors into teaching. Headline $3.25M is mostly student scholarships — low net to Relay; likely needs a STEM prime."},
  {rec:"QUALIFY",fit:52,elig:"Med",eligWarn:false,inst:"grant",net:"verify",netWarn:false,close:"see NOFO",days:null,effort:"High",path:"ask eligibility",title:"FIPSE — Postsecondary Student Success (84.116)",url:FR+"2026/06/03/2026-11110/notice-announcing-fund-for-the-improvement-of-postsecondary-education-postsecondary-student-success",source:"Fed. Register",summary:"ED innovation fund for postsecondary student success; confirm whether graduate educator-prep is in scope."},
- {rec:"WATCH",fit:48,elig:"—",eligWarn:false,inst:"coop agr / TA center",net:"partner-only",netWarn:false,close:"Aug 10, 2026",days:4,effort:"—",path:"cultivate a prime",title:"OSEP 84.326 TA / Dissemination centers (3 notices)",url:GG+"362807",source:"grants.gov + FR",summary:"SpEd TA centers (cooperative agreements, single awards). Past winners: Univ Oregon, WestEd, Univ Kansas — established TA orgs. Partner-only for Relay."},
- {rec:"WATCH",fit:40,elig:"—",eligWarn:false,inst:"coop agr",net:"partner-only",netWarn:false,close:"Oct 14, 2026",days:51,effort:"—",path:"find eng-research prime",title:"NSF Research Experiences for Teachers, Eng/CS (47.070)",url:GG+"350802",source:"grants.gov",summary:"Research experiences for K-12 STEM teachers; requires an engineering/CS research host Relay lacks."},
+ {rec:"WATCH",fit:40,elig:"—",eligWarn:false,inst:"coop agr",net:"partner-only",netWarn:false,close:"Oct 14, 2026",days:46,effort:"—",path:"find eng-research prime",title:"NSF Research Experiences for Teachers, Eng/CS (47.070)",url:GG+"350802",source:"grants.gov",summary:"Research experiences for K-12 STEM teachers; requires an engineering/CS research host Relay lacks."},
  {rec:"WATCH",fit:30,elig:"—",eligWarn:false,inst:"grant",net:"—",netWarn:false,close:"see NOFO",days:null,effort:"—",path:"monitor",title:"School Safety Enhancement (84.184)",url:FR+"2026/06/03/2026-11103/notice-announcing-school-safety-enhancement-program-competition",source:"Fed. Register",summary:"ED school-safety infrastructure; outside Relay's educator-prep core."},
  {rec:"WATCH",fit:null,elig:"—",eligWarn:false,inst:"—",net:"—",netWarn:false,close:"see notice",days:null,effort:"—",path:"identify program",title:"Reopening/Extension of Deadlines (program unnamed)",url:FR+"2026/06/26/2026-12972/reopening-or-extension-of-application-deadline-dates-applications-for-new-awards",source:"Fed. Register",summary:"FR notice doesn't name the program in machine-readable form — open it to identify which competition. Prefilter-audit item."},
  {rec:"NO_GO",fit:15,elig:"—",eligWarn:false,inst:"grant",net:"—",netWarn:false,close:"see NOFO",days:null,effort:"—",path:"not educator prep (Title VI)",title:"Centers Aligned With Areas of National Need (84.015)",url:FR+"2026/06/12/2026-11893/notice-announcing-centers-aligned-with-areas-of-national-need-program-competition",source:"Fed. Register",summary:"Corrected via ALN lookup: Title VI foreign-language/area-studies National Resource Centers — not educator preparation."},
- {rec:"NO_GO",fit:12,elig:"No",eligWarn:true,inst:"grant",net:"—",netWarn:false,close:"Aug 9, 2026",days:3,effort:"—",path:"IHE EXCLUDED",title:"DOS: Mentor Program for English Educators (19.022)",url:GG+"363064",source:"grants.gov",summary:"State Dept overseas English mentoring; eligibility restricted to 501(c)(3)s OTHER THAN IHEs → Relay excluded."},
- {rec:"NO_GO",fit:12,elig:"No",eligWarn:true,inst:"grant",net:"—",netWarn:false,close:"Aug 7, 2026",days:3,effort:"—",path:"IHE EXCLUDED",title:"DOS: Empowering English Educators (19.022)",url:GG+"363060",source:"grants.gov",summary:"State Dept overseas English educators; 501(c)(3) other than IHE → Relay excluded."},
- {rec:"NO_GO",fit:15,elig:"—",eligWarn:false,inst:"grant",net:"—",netWarn:false,close:"Aug 17, 2026",days:9,effort:"—",path:"mission: TEFL abroad",title:"DOS: English Language Teaching & Learning (19.022)",url:GG+"363077",source:"grants.gov",summary:"State Dept overseas English-language teaching; not Relay's domain."},
+ {rec:"NO_GO",fit:15,elig:"—",eligWarn:false,inst:"grant",net:"—",netWarn:false,close:"Aug 17, 2026",days:4,effort:"—",path:"mission: TEFL abroad",title:"DOS: English Language Teaching & Learning (19.022)",url:GG+"363077",source:"grants.gov",summary:"State Dept overseas English-language teaching; not Relay's domain."},
  // ── Out-of-band IL finds 2026-08-04 (manual ISBE check — wired fundingops page is operationally broken; see digest Uncertainties. CSFA supplementary source recommended, not yet wired). ──
- {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"grant",net:"—",netWarn:false,close:"Aug 6, 2026",days:2,effort:"—",path:"intent window closed · mission",title:"IL ISBE — FY27 After School Programs, Non-School Districts",url:"https://www.isbe.net/Pages/After-School-Programs.aspx",source:"ISBE (manual)",tier:"state",summary:"~$19.3M competitive after-school direct-service programming — not an educator-prep line, and only entities that filed an Intent to Apply may submit. Found via manual check; the wired fundingops page shows zero. Deadline verified from the ISBE program page 2026-08-04."},
- {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"grant",net:"—",netWarn:false,close:"Aug 24, 2026",days:14,effort:"—",path:"mission: after-school centers",title:"IL ISBE — FY27 21st Century Community Learning Centers (21st CCLC)",url:"https://www.isbe.net/Pages/21CCLC-PG.aspx",source:"ISBE (manual)",tier:"state",summary:"~$25M for after-school/summer community learning centers ($50k–$600k awards; LEAs, charters, CBOs, FBOs, tribal orgs) — direct student programming, not Relay's educator-prep/PD line. Found via manual check. Deadline verified from the ISBE 21CCLC page 2026-08-04."},
+ {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"grant",net:"—",netWarn:false,close:"Aug 24, 2026",days:9,effort:"—",path:"mission: after-school centers",title:"IL ISBE — FY27 21st Century Community Learning Centers (21st CCLC)",url:"https://www.isbe.net/Pages/21CCLC-PG.aspx",source:"ISBE (manual)",tier:"state",summary:"~$25M for after-school/summer community learning centers ($50k–$600k awards; LEAs, charters, CBOs, FBOs, tribal orgs) — direct student programming, not Relay's educator-prep/PD line. Found via manual check. Deadline verified from the ISBE 21CCLC page 2026-08-04."},
  // ── District (Phase C) — from 2026-07-08; listing reconfirmed live on every run since (records unchanged 2026-08-04). ──
- {rec:"QUALIFY",fit:69,elig:"Med",eligWarn:false,inst:"contract",net:"institutional · fee-for-service (TBD)",netWarn:false,close:"Sep 30, 2026",days:41,effort:"Medium",path:"register Ionwave · pull RFP",title:"Houston ISD — Leadership, Teacher, and Staff Development (RFP 26-04-47)",url:"https://houstonisd.ionwave.net/SourcingEvents.aspx?SourceType=1",source:"Ionwave",tier:"district",summary:"HISD annual vendor-pool RFP for teacher/leadership/staff PD — dead-center Relay vendor line (Teacher Professional Education + NPAF). Deep target, full high-need carve-out. QUALIFY: RFP packet value/pre-bid/insurance not machine-readable — register + pull packet. Closes 9/30/2026 10:00 CT."},
- {rec:"QUALIFY",fit:60,elig:"Med",eligWarn:false,inst:"contract",net:"institutional · fee-for-service (TBD)",netWarn:false,close:"Sep 30, 2026",days:41,effort:"Medium",path:"register Ionwave · pull RFP",title:"Houston ISD — Student Services, Enrichment, Tutorials, and Mentoring (RFP 26-04-36)",url:"https://houstonisd.ionwave.net/SourcingEvents.aspx?SourceType=1",source:"Ionwave",tier:"district",summary:"Companion HISD vendor-pool RFP; tutorials + mentoring map to Relay's high-dosage tutoring/mentoring lines (secondary to PD). Deep target, carve-out. QUALIFY: packet unverified; tutoring is a non-core Relay line. Closes 9/30/2026 10:00 CT."},
+ {rec:"QUALIFY",fit:69,elig:"Med",eligWarn:false,inst:"contract",net:"institutional · fee-for-service (TBD)",netWarn:false,close:"Sep 30, 2026",days:36,effort:"Medium",path:"register Ionwave · pull RFP",title:"Houston ISD — Leadership, Teacher, and Staff Development (RFP 26-04-47)",url:"https://houstonisd.ionwave.net/SourcingEvents.aspx?SourceType=1",source:"Ionwave",tier:"district",summary:"HISD annual vendor-pool RFP for teacher/leadership/staff PD — dead-center Relay vendor line (Teacher Professional Education + NPAF). Deep target, full high-need carve-out. QUALIFY: RFP packet value/pre-bid/insurance not machine-readable — register + pull packet. Closes 9/30/2026 10:00 CT."},
+ {rec:"QUALIFY",fit:60,elig:"Med",eligWarn:false,inst:"contract",net:"institutional · fee-for-service (TBD)",netWarn:false,close:"Sep 30, 2026",days:36,effort:"Medium",path:"register Ionwave · pull RFP",title:"Houston ISD — Student Services, Enrichment, Tutorials, and Mentoring (RFP 26-04-36)",url:"https://houstonisd.ionwave.net/SourcingEvents.aspx?SourceType=1",source:"Ionwave",tier:"district",summary:"Companion HISD vendor-pool RFP; tutorials + mentoring map to Relay's high-dosage tutoring/mentoring lines (secondary to PD). Deep target, carve-out. QUALIFY: packet unverified; tutoring is a non-core Relay line. Closes 9/30/2026 10:00 CT."},
  // ── Standing from 2026-07-14 (CT Sheff hypothesis remains open, rolling). ──
  {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"formula subgrant",net:"vendor $ downstream (hypothesis)",netWarn:false,close:"rolling FY27–29",days:null,effort:"—",path:"cultivate Hartford/CREC",title:"CT — Sheff Region Interdistrict Magnet Reformulation Grant (RFP 867)",url:"https://portal.ct.gov/-/media/sde/rfp/rfp867_sheff_region_magnet_reformulation_grant_fy27-29.docx?rev=20a37d1a7a9148d7bb0d0675fae0078d&hash=70922E6FEC1DC7C157BC455967F579FA",source:"CT CSDE",tier:"state",summary:"Operator-only (Hartford/E. Hartford/Bloomfield BOEs, CREC, Goodwin) — Relay cannot apply. Converted to a Stream 2 partnership hypothesis: operators pick their own vendors, teacher recruitment is a required progress metric, Hartford PS is a target. Cultivate by 2026-12-31. Full RFP read 2026-07-14."},
- // ── Standing from 2026-07-24 (NYSED SIG hypothesis — see list below the table). ──
- {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"formula subgrant",net:"vendor $ downstream (hypothesis)",netWarn:false,close:"Aug 15, 2026",days:8,effort:"—",path:"cultivate NYC DOE (Bronx D7/D12)",title:"NY — NYSED Title I, 1003 School Improvement Grant, Innovation (SIG)",url:"https://www.nysed.gov/funding-opportunities/2026-27-title-i-1003-school-improvement-grant-innovation",source:"NYSED",tier:"state",summary:"LEA-only: Target Districts with a school under Superintendent Receivership (27 schools, 11 districts incl. 2 NYC Bronx schools). $200k/school, SY 2026-27, no carryover. Relay cannot apply — but instructional-coaching/PD consultant spend is explicitly allowable (Code 40), so it converts to a vendor-cultivation hypothesis. Announcement PDF (Attachments A+B) read 2026-07-24."},
- {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"grant",net:"—",netWarn:false,close:"Aug 6, 2026",days:2,effort:"—",path:"mission: overseas ELT",title:"DOS Djibouti — English Language Teaching Services (19.441)",url:GG+"363087",source:"grants.gov",summary:"US Embassy Djibouti public-diplomacy English teaching for Djiboutian participants; $5k–25k awards. Verified via fetchOpportunity 2026-07-24."},
- {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Aug 26, 2026",days:16,effort:"—",path:"mission: disability claim reviews",title:"IN — DDB Speech & Language Consultation (RFP 26-87266)",url:"https://www.in.gov/idoa/proc/solicitations/files/004050000087266.zip",source:"IN IDOA",tier:"state",summary:"Licensed-SLP reviews of SSDI/SSI disability claims for Indiana DDB — state-internal fee-for-service, not a Relay line."},
- {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Aug 26, 2026",days:16,effort:"—",path:"mission: disability claim reviews",title:"IN — DDB Medical Consultation (RFP 26-87343)",url:"https://www.in.gov/idoa/proc/solicitations/files/004050000087343.zip",source:"IN IDOA",tier:"state",summary:"MD/DO disability-claim reviews for Indiana DDB — same vehicle as the SLP RFP, same NO-GO."},
- {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Aug 26, 2026",days:16,effort:"—",path:"mission: psychometrics",title:"IN — ILEARN / ACCESS ELP Growth Analysis (007000000087901)",url:"https://www.in.gov/idoa/proc/solicitations/files/007000000087901.zip",source:"IN IDOA",tier:"state",summary:"Statewide assessment growth-modeling for IDOE accountability (ESSA 1111(c)-(d)) — psychometrics vendor work, not Relay's service lines; RFP asks for continuity with the incumbent."},
- {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Aug 14, 2026",days:8,effort:"—",path:"mission: health app",title:"TN — Pregnancy & Postpartum Mobile Education App (RFP 34320-19527)",url:"https://www.tn.gov/content/dam/tn/generalservices/documents/cpo/rfp-updates/34320-19527/RFP_34320-19527_Solicitation_Notice_CONFIDENTIAL.docx",source:"TN CPO",tier:"state",summary:"Maternal-health mobile app development — 'education' in title only."},
- {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Aug 5, 2026",days:1,effort:"—",path:"mission: food service",title:"TN — Dining Services, Public Safety Training Academy (RFP 32101-01232026-SR1, Amd 1)",url:"https://www.tn.gov/content/dam/tn/generalservices/documents/cpo/rfp-updates/32101-01232026-sr1/RFP_32101-01232026-SR1.pdf",source:"TN CPO",tier:"state",summary:"Food service — explicitly outside the vendor path. Amendment 1 re-surfaced it; still NO-GO (first screened 2026-07-07)."},
- {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"~Sep 1, 2026 (ext.)",days:20,effort:"—",path:"mission: staffing MSP",title:"TN — SWC 387 Contingent Workforce MSP (RFP 32110-38726, Amd 4)",url:"https://www.tn.gov/content/dam/tn/generalservices/documents/cpo/rfp-updates/32110-38726/RFP_32110-38726_MSP_for_Contingent_Workforce_Services.pdf",source:"TN CPO",tier:"state",summary:"Statewide temp-staffing managed-service-provider vehicle — 'workforce' keyword false-positive. Amendment 4 appears to extend the due date 08/17 → 09/01/2026 (listing-parsed); still NO-GO (first screened 2026-07-07)."},
+ // ── Standing from 2026-07-24 (NYSED SIG hypothesis — see the Hypotheses view). ──
+ {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"formula subgrant",net:"vendor $ downstream (hypothesis)",netWarn:false,close:"Aug 15, 2026",days:3,effort:"—",path:"cultivate NYC DOE (Bronx D7/D12)",title:"NY — NYSED Title I, 1003 School Improvement Grant, Innovation (SIG)",url:"https://www.nysed.gov/funding-opportunities/2026-27-title-i-1003-school-improvement-grant-innovation",source:"NYSED",tier:"state",summary:"LEA-only: Target Districts with a school under Superintendent Receivership (27 schools, 11 districts incl. 2 NYC Bronx schools). $200k/school, SY 2026-27, no carryover. Relay cannot apply — but instructional-coaching/PD consultant spend is explicitly allowable (Code 40), so it converts to a vendor-cultivation hypothesis. Announcement PDF (Attachments A+B) read 2026-07-24."},
+ {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Aug 26, 2026",days:11,effort:"—",path:"mission: disability claim reviews",title:"IN — DDB Speech & Language Consultation (RFP 26-87266)",url:"https://www.in.gov/idoa/proc/solicitations/files/004050000087266.zip",source:"IN IDOA",tier:"state",summary:"Licensed-SLP reviews of SSDI/SSI disability claims for Indiana DDB — state-internal fee-for-service, not a Relay line."},
+ {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Aug 26, 2026",days:11,effort:"—",path:"mission: disability claim reviews",title:"IN — DDB Medical Consultation (RFP 26-87343)",url:"https://www.in.gov/idoa/proc/solicitations/files/004050000087343.zip",source:"IN IDOA",tier:"state",summary:"MD/DO disability-claim reviews for Indiana DDB — same vehicle as the SLP RFP, same NO-GO."},
+ {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Aug 26, 2026",days:11,effort:"—",path:"mission: psychometrics",title:"IN — ILEARN / ACCESS ELP Growth Analysis (007000000087901)",url:"https://www.in.gov/idoa/proc/solicitations/files/007000000087901.zip",source:"IN IDOA",tier:"state",summary:"Statewide assessment growth-modeling for IDOE accountability (ESSA 1111(c)-(d)) — psychometrics vendor work, not Relay's service lines; RFP asks for continuity with the incumbent."},
+ {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Aug 14, 2026",days:3,effort:"—",path:"mission: health app",title:"TN — Pregnancy & Postpartum Mobile Education App (RFP 34320-19527)",url:"https://www.tn.gov/content/dam/tn/generalservices/documents/cpo/rfp-updates/34320-19527/RFP_34320-19527_Solicitation_Notice_CONFIDENTIAL.docx",source:"TN CPO",tier:"state",summary:"Maternal-health mobile app development — 'education' in title only."},
+ {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"~Sep 1, 2026 (ext.)",days:15,effort:"—",path:"mission: staffing MSP",title:"TN — SWC 387 Contingent Workforce MSP (RFP 32110-38726, Amd 4)",url:"https://www.tn.gov/content/dam/tn/generalservices/documents/cpo/rfp-updates/32110-38726/RFP_32110-38726_MSP_for_Contingent_Workforce_Services.pdf",source:"TN CPO",tier:"state",summary:"Statewide temp-staffing managed-service-provider vehicle — 'workforce' keyword false-positive. Amendment 4 appears to extend the due date 08/17 → 09/01/2026 (listing-parsed); still NO-GO (first screened 2026-07-07)."},
  // ── New this run 2026-07-30 (all screened out; none converted to hypotheses — FCEP considered and rejected, see digest). ──
  {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"coop agreement (forecast)",net:"—",netWarn:false,close:"forecast",days:null,effort:"—",path:"mission: medical GME",title:"HRSA — Teaching Health Center Graduate Medical Education (93.530, HRSA-27-084)",url:GG+"363324",source:"grants.gov",summary:"Community-based primary-care MEDICAL residency training — 'teacher residency' keyword false positive. Re-posted FY27 forecast of a program first screened out 2026-07-08; past winners are medical GME centers."},
- {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"formula subgrant",net:"—",netWarn:false,close:"Sep 15, 2026",days:30,effort:"—",path:"LEA/BOCES-only · no Relay line",title:"NY — NYSED RFP #199 MBK Family & Community Engagement Program 2026-30",url:"https://www.nysed.gov/funding-opportunities/rfp-199-mbk-family-and-community-engagement-program-fcep-2026-2030",source:"NYSED",tier:"state",summary:"District/BOCES-only ($9.3M/yr; $3.1M NYC), 25% district match, 4-yr term. IHE is an allowed PARTNER category but the funded work is family/community engagement — not a Relay service line — so not converted to a hypothesis. Verified from RFP page 2026-07-30."},
- {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"pass-through",net:"—",netWarn:false,close:"Aug 31, 2026",days:19,effort:"—",path:"MBK networks only",title:"NY — NYSED 2026-27 My Brother's Keeper Fellows Program",url:"https://www.nysed.gov/funding-opportunities/2026-2027-my-brothers-keeper-fellows-program",source:"NYSED",tier:"state",summary:"Only approved NYS MBK Community Networks may apply (district fiscal agent). $750k total at $5,950/Fellow/yr — de-minimis student-mentorship pass-through. Verified 2026-07-30."},
- {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"formula subgrant",net:"—",netWarn:false,close:"Aug 28, 2026",days:18,effort:"—",path:"contracted districts only",title:"NY — NYSED MBK Indigenous Education Grant",url:"https://www.nysed.gov/funding-opportunities/new-york-state-mbk-indigenous-education-grant",source:"NYSED",tier:"state",summary:"Restricted to districts contracted with the NYSED Office of Indigenous Education + signed tribal MOA; formula allocations per eligible-student count. Verified 2026-07-30."},
- {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract (RFI)",net:"—",netWarn:false,close:"Aug 27, 2026",days:17,effort:"—",path:"mission: childcare ops",title:"IN — Government Center Daycare Services (RFI 000610000087934)",url:"https://www.in.gov/idoa/proc/solicitations/files/000610000087934.zip",source:"IN IDOA",tier:"state",summary:"RFI to operate an on-site childcare center for Indiana state employees — childcare facility operations, not educator development."},
- {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Sep 2, 2026",days:21,effort:"—",path:"direct student services",title:"IN DOE — SEA General Supervision Corrective Action (RFQ 0000088051)",url:"https://www.in.gov/idoa/proc/solicitations/files/007000000088051.zip",source:"IN IDOA",tier:"state",summary:"Court-ordered COMPENSATORY SpEd services (32–304 hrs math/reading) delivered directly to six named students from a closed school corporation, plus IEP transportation — direct student instruction, not Relay's SpEd PD/staffing line. Full RFQ PDF read 2026-07-30."},
- // NYC alt-cert (RFI I1869040) remains WATCH/cultivate — a CLOSED RFI (window ended 1/23/2026); follow-on RFP expected H2 2026 (window now open — monitor PASSPort/City Record).
+ {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"formula subgrant",net:"—",netWarn:false,close:"Sep 15, 2026",days:25,effort:"—",path:"LEA/BOCES-only · no Relay line",title:"NY — NYSED RFP #199 MBK Family & Community Engagement Program 2026-30",url:"https://www.nysed.gov/funding-opportunities/rfp-199-mbk-family-and-community-engagement-program-fcep-2026-2030",source:"NYSED",tier:"state",summary:"District/BOCES-only ($9.3M/yr; $3.1M NYC), 25% district match, 4-yr term. IHE is an allowed PARTNER category but the funded work is family/community engagement — not a Relay service line — so not converted to a hypothesis. Verified from RFP page 2026-07-30."},
+ {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"scholarship pass-through",net:"—",netWarn:false,close:"Aug 31, 2026",days:14,effort:"—",path:"MBK networks only",title:"NY — NYSED 2026-27 My Brother's Keeper Fellows Program",url:"https://www.nysed.gov/funding-opportunities/2026-2027-my-brothers-keeper-fellows-program",source:"NYSED",tier:"state",summary:"Only approved NYS MBK Community Networks may apply (district fiscal agent). $750k total at $5,950/Fellow/yr — de-minimis student-mentorship pass-through. Verified 2026-07-30."},
+ {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"formula subgrant",net:"—",netWarn:false,close:"Aug 28, 2026",days:13,effort:"—",path:"contracted districts only",title:"NY — NYSED MBK Indigenous Education Grant",url:"https://www.nysed.gov/funding-opportunities/new-york-state-mbk-indigenous-education-grant",source:"NYSED",tier:"state",summary:"Restricted to districts contracted with the NYSED Office of Indigenous Education + signed tribal MOA; formula allocations per eligible-student count. Verified 2026-07-30."},
+ {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract (RFI)",net:"—",netWarn:false,close:"Aug 27, 2026",days:12,effort:"—",path:"mission: childcare ops",title:"IN — Government Center Daycare Services (RFI 000610000087934)",url:"https://www.in.gov/idoa/proc/solicitations/files/000610000087934.zip",source:"IN IDOA",tier:"state",summary:"RFI to operate an on-site childcare center for Indiana state employees — childcare facility operations, not educator development."},
+ {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Sep 2, 2026",days:16,effort:"—",path:"direct student services",title:"IN DOE — SEA General Supervision Corrective Action (RFQ 0000088051)",url:"https://www.in.gov/idoa/proc/solicitations/files/007000000088051.zip",source:"IN IDOA",tier:"state",summary:"Court-ordered COMPENSATORY SpEd services (32–304 hrs math/reading) delivered directly to six named students from a closed school corporation, plus IEP transportation — direct student instruction, not Relay's SpEd PD/staffing line. Full RFQ PDF read 2026-07-30."},
+ // ── New this run 2026-08-11 (12 screened; CT HDT converted to a vendor hypothesis — see HYPOTHESES; TX ESBD cloud-implementation + workforce-forum records and the FR umbrella notice 2026-16259 are digest-only: closed/awarded/duplicate). ──
+ {rec:"NO_GO",fit:18,elig:"—",eligWarn:false,inst:"grant",net:"—",netWarn:false,close:"Oct 1, 2026",days:37,effort:"—",path:"mission: research training",title:"IES NCSER — Research Training Programs in Special Education (84.324B)",url:GG+"363467",source:"grants.gov",status:"NEW",summary:"Early-career development + methods training for SpEd RESEARCHERS. Research-institution program — past 84.324 winners are Oregon, Vanderbilt, UNC, ORI, RAND — not educator prep. Eligibility + 10/1/2026 deadline verified via fetchOpportunity 2026-08-11; FR umbrella notice 2026-16259."},
+ {rec:"NO_GO",fit:15,elig:"—",eligWarn:false,inst:"grant",net:"—",netWarn:false,close:"Oct 1, 2026",days:37,effort:"—",path:"state-agency SLDS research",title:"IES NCSER — Longitudinal Data for State SpEd Policymaking (84.324S)",url:GG+"363471",source:"grants.gov",status:"NEW",summary:"Funds STATE AGENCIES' use of statewide longitudinal data systems for SpEd policy decisions; applications must include the state agency; $1.2M ceiling. Not a Relay line. Verified 2026-08-11."},
+ {rec:"NO_GO",fit:15,elig:"—",eligWarn:false,inst:"grant",net:"—",netWarn:false,close:"Oct 1, 2026",days:37,effort:"—",path:"state-agency SLDS research",title:"IES NCER — Longitudinal Data for State Policymaking (84.305S)",url:GG+"363469",source:"grants.gov",status:"NEW",summary:"Companion NCER SLDS competition ('grow your own teacher' keyword false positive). The FR umbrella notice 2026-16259 also covers the 84.305B/D research-training programs — same screen, one entry."},
+ {rec:"NO_GO",fit:22,elig:"No",eligWarn:true,inst:"grant",net:"—",netWarn:false,close:"Sep 18, 2026",days:28,effort:"—",path:"charter ed corps only · customer-base signal",title:"NY — NYSED RFP #458 Charter Schools Program (CSP) Expansion Grants",url:"https://www.nysed.gov/funding-opportunities/rfp-458-charter-schools-programs-csp-expansion-grants",source:"NYSED",tier:"state",status:"NEW",summary:"$14M federal CSP via NYSED for EXISTING charter education corporations expanding seats/grades (Regents / Buffalo BOE / NYC DOE / SUNY authorizers). Relay cannot apply — but awardees are Relay's NY customer base and expansion budgets can carry staff development. RFP updated 8/7 with increased award amounts; NOI due 9/4. Verified from RFP page 2026-08-11."},
+ {rec:"NO_GO",fit:20,elig:"No",eligWarn:true,inst:"grant",net:"—",netWarn:false,close:"Sep 18, 2026",days:28,effort:"—",path:"charter ed corps only",title:"NY — NYSED RFP #457 Charter Schools Program (CSP) Start-Up Grants",url:"https://www.nysed.gov/funding-opportunities/rfp-457-charter-schools-programs-csp-start-grants",source:"NYSED",tier:"state",status:"NEW",summary:"$12M CSP start-up companion for NEW charters authorized by Regents or SUNY; education corporation applies for the school. Same eligibility screen as #458. Verified from RFP page 2026-08-11."},
+ {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"formula subgrant",net:"vendor $ downstream (hypothesis)",netWarn:false,close:"Sep 11, 2026",days:23,effort:"—",path:"get on CSDE tutor-vendor list",title:"CT — High-Dosage Tutoring Competitive Grant for LEAs (RFP 868)",url:"https://portal.ct.gov/-/media/sde/rfp/rfp868_connecticut_hdt_programlea_competitivegrantapplication2026.pdf?rev=e5570994dff2453f834714513caaf964&hash=A09F313A2BC255E223ED7EEB143DE889",source:"CT CSDE",tier:"state",status:"NEW",summary:"PA 26-68 §1: $2M to LEAs, up to $50k/LEA (~$2,500/student), spend by 6/30/2027; apps due 9/11, awards 9/25. LEA-only — Relay cannot apply — but tutors MUST come from a CSDE-approved vendor list (non-approved organizations prohibited). Converted to a vendor-cultivation hypothesis. Full RFP PDF read 2026-08-11."},
+ {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"grant",net:"—",netWarn:false,close:"Sep 25, 2026",days:33,effort:"—",path:"district-side wraparound services",title:"CT — Open Choice Grant-in-Aid, Wraparound Services (RFP 860)",url:"https://portal.ct.gov/-/media/sde/rfp/rfp860_openchoicegrant-in-aid_wraparoundservices_2026-27.docx?rev=395c57843a5a4a6a8007f5875e42a935&hash=A2CB633F0F8DFE7727C1BEE8DBEBB7EB",source:"CT CSDE",tier:"state",status:"NEW",summary:"Up to $2M (C.G.S. 10-266aa(k)(3)) for wraparound services — tutoring, family engagement, college/career prep — for Open Choice students, SY 2026-27; districts apply by 9/25. District-side direct student services, not Relay's educator-prep/PD line. DOCX read 2026-08-11."},
+ {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Sep 7, 2026",days:19,effort:"—",path:"mission: ammunition",title:"IN — ILEA Force-on-Force Ammunition, 9mm (001030000088097)",url:"https://www.in.gov/idoa/proc/solicitations/files/001030000088097.zip",source:"IN IDOA",tier:"state",status:"NEW",summary:"32,000 rounds of training ammunition for the Indiana Law Enforcement Academy — 'training' keyword false positive."},
+ // NYC alt-cert (RFI I1869040) remains a cultivation item — a CLOSED RFI (window ended 1/23/2026); follow-on RFP expected H2 2026 (window now open — monitor PASSPort/City Record). See Hypotheses.
 ];
-const tb=document.querySelector("#tbl tbody");
-function cell(v){return v==null?'<span class="un">\u2014</span>':v;}
-/* Color restraint (Few 2008 rules 3/5/7; Tufte-Imhof): normal states stay neutral ink;
-   color marks only what needs attention. Days: amber \u226415 bd, crimson \u22645 bd. */
-const daysCls=n=>n==null?'':(n<=5?'sr':n<=15?'sa':'');
-const eligCls=e=>e==='No'?'sr':e==='Low'?'sa':'';
-const netCls=n=>/pass-through|\u26a0/.test(n)?'sa':'';
-const effCls=e=>e==='Very High'?'sa':'';
-function rowHTML(r,i){
-  const d=r.days==null?'<span class="un">\u2014</span>':`<span class="days ${daysCls(r.days)}">${r.days} bd</span>`;
-  const alt=i%2?' class="alt"':'';
-  return `<tr${alt} data-i="${r._ix}">
-      <td class="t"><button class="exp" aria-expanded="false" aria-label="Show full summary">\u25b8</button><a href="${r.url}" target="_blank" rel="noopener">${r.title}</a><div class="desc">${r.summary}</div></td>
-      <td><span class="rec r-${r.rec}"><span class="glyph" aria-hidden="true">${REC_GLYPH[r.rec]}</span>${REC_LABEL[r.rec]}</span></td>
-      <td class="num">${d}</td>
-      <td>${r.close}</td>
-      <td>${r.path}</td>
-      <td class="num fit">${cell(r.fit)}</td>
-      <td class="${eligCls(r.elig)}">${r.elig}</td>
-      <td class="${netCls(r.net)}">${r.net}</td>
-      <td class="inst">${r.inst}</td>
-      <td class="${effCls(r.effort)}">${r.effort}</td>
-      <td>${r.source}</td>
-    </tr>`;
+
+// ── Stream 2 partnership hypotheses: cultivation signals, never pursuable opps —
+//    rendered in their own view, kept OUT of the opportunity feed by design. ──
+const HYPOTHESES=[
+ {title:"CT · HDT approved-vendor list → CSDE (RFP 868)",
+  body:"CSDE's $2M High-Dosage Tutoring grant requires awarded LEAs to procure tutors ONLY from a CSDE-approved vendor list — tutors from non-approved organizations are prohibited, and the RFP names vendor-provided trained tutors as the delivery mechanism. Relay's high-dosage tutoring line qualifies it to seek listing; the play is CSDE Academic Office outreach on the vendor-approval process, not the grant itself.",
+  signal:"RFP 868 published 8/7/2026; LEA apps due 9/11, awards 9/25", by:"Cultivate by 2026-09-25 (award date)", owner:"none (new) · added 08-11"},
+ {title:"CT · Sheff Reformulation → Hartford PS / CREC",
+  body:"Operators select their own vendors and teacher recruitment is a required progress metric. Relay's role: PD / residency / certification vendor under an operator's plan; CREC also opens the CT RESC co-op path.",
+  signal:"CSDE RFP 867, FY27–29 rolling", by:"Cultivate by 2026-12-31", owner:"none (cold) · standing since 07-14"},
+ {title:"NY · NYC DOE alt-cert follow-on RFP",
+  body:"Follow-on RFP expected from closed RFI I1869040. Cultivate NYCDOE OTRQ, register finance360, and monitor PASSPort / City Record for the posting.",
+  signal:"RFI I1869040 (closed 1/23/26)", by:"Window H2 2026 · open now", owner:"none · standing since 07-08"},
+ {title:"NY · NYSED Title I 1003 SIG (Innovation) → NYC DOE",
+  body:"Bronx D7 PS/IS 224 + D12 Bronx Career & College Prep HS, $200k each, SY 2026-27, no carryover. Instructional-coaching / PD consultant spend explicitly allowable (FS-10 Code 40); Relay's role is PD/coaching vendor to awarded schools — selling window is early fall.",
+  signal:"districts apply by 8/15/2026", by:"Cultivate by 2026-09-15 (~30 bd)", owner:"none (cold) · added 07-24"},
+];
+
+const META = {updated: "2026-08-11 · 12 new screened · 0 pursuits · 1 new hypothesis (CT HDT vendor list) · prior run 8/04 · 133 tracked all-time"};
+
+// ── Team triage (repo-backed; same mechanism as the Calenhad sibling, own repo
+//    + own storage keys so the two dashboards never share tokens or state). ──
+const REPO = "csthomasii/relay-funding-dashboard", TRIAGE_API =
+  `https://api.github.com/repos/${REPO}/contents/triage.json`;
+let T = {items:{}}, tDirty = new Set(), tTimer = null, syncState = "loading", putFails = 0;
+// Storage access is fully guarded: corrupt JSON, denied storage, or private-mode quota
+// must never blank the app.
+const lsGet = (k,f) => { try{ const v = localStorage.getItem(k); return v===null?f:v; }catch(e){ return f; } };
+const lsSet = (k,v) => { try{ localStorage.setItem(k,v); }catch(e){} };
+const lsDel = k => { try{ localStorage.removeItem(k); }catch(e){} };
+const lsJson = (k,f) => { try{ const v = JSON.parse(lsGet(k,"null")); return (v===null||v===undefined)?f:v; }catch(e){ return f; } };
+const tok = () => lsGet("fd_token","");
+const who = () => lsGet("fd_name","");
+const READ = new Set(Array.isArray(lsJson("fd_read",[]))?lsJson("fd_read",[]):[]);
+const iid = r => { if(r.id) return "i"+String(r.id).replace(/[^A-Za-z0-9_-]/g,"");
+  let h=5381, s=(r.url||"")+"|"+r.title;
+  for(let i=0;i<s.length;i++) h=((h<<5)+h+s.charCodeAt(i))>>>0; return "i"+h.toString(36); };
+const safeUrl = u => /^https?:\/\//i.test(String(u||"")) ? String(u) : "";
+const tGet = r => T.items[iid(r)]||{};
+const b64d = s => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\n/g,"")),c=>c.charCodeAt(0)));
+const b64e = s => { const b=new TextEncoder().encode(s); let x=""; b.forEach(c=>x+=String.fromCharCode(c)); return btoa(x); };
+function tSet(r, patch){
+  const id = iid(r);
+  T.items[id] = Object.assign({}, T.items[id], patch,
+    {t: (r.title||"").slice(0,90), by: who()||undefined, at: new Date().toISOString()});
+  tDirty.add(id);
+  lsSet("fd_pending", JSON.stringify(Object.fromEntries([...tDirty].map(k=>[k,T.items[k]]))));
+  schedSync(); setSync();
 }
-function render(rows){ tb.innerHTML=rows.map((r,i)=>rowHTML(r,i)).join(""); }
-DATA.forEach((r,ix)=>r._ix=ix);
-const tierOf=r=>r.tier || (/grants\.gov|register|fed\.\s*reg|\bFR\b/i.test(r.source||"") ? "federal" : "state");
-let sortKey="recRank",asc=true,tierFilter="all",showNoGo=false;
-const SORT_LABEL={title:"opportunity",recRank:"recommendation",days:"days to close",close:"close date",path:"next step",fit:"fit score",elig:"eligibility",net:"net to Relay",inst:"instrument",effort:"effort",source:"source"};
-function sortRows(){
-  const rows=DATA.filter(r=>(tierFilter==="all"||tierOf(r)===tierFilter)&&(showNoGo||r.rec!=="NO_GO")).map(r=>({...r,recRank:RANK[r.rec]}));
-  rows.sort((a,b)=>{
-    let x=a[sortKey],y=b[sortKey];
-    if(sortKey==="days"||sortKey==="fit"){x=x==null?(sortKey==="fit"?-1:1e9):x;y=y==null?(sortKey==="fit"?-1:1e9):y;}
-    if(typeof x==="string"){x=x.toLowerCase();y=(""+y).toLowerCase();}
-    if(x<y)return asc?-1:1; if(x>y)return asc?1:-1;
-    return a.recRank-b.recRank||(b.fit||0)-(a.fit||0);
-  });
-  render(rows);
-  document.querySelectorAll("th[data-k]").forEach(th=>{
-    const on=th.dataset.k===sortKey;
-    if(on)th.setAttribute("aria-sort",asc?"ascending":"descending"); else th.removeAttribute("aria-sort");
-    th.querySelector(".si").textContent=on?(asc?"\u25b2":"\u25bc"):"\u25b3";
-  });
+function markRead(r){ const id=iid(r); if(READ.has(id)) return;
+  READ.add(id); lsSet("fd_read", JSON.stringify([...READ])); }
+async function loadTriage(){
+  let bad = false;
+  try{
+    const h = {Accept:"application/vnd.github+json"};
+    if(tok()) h.Authorization = "Bearer "+tok();
+    const res = await fetch(TRIAGE_API, {headers:h});
+    bad = tok() && (res.status===401 || res.status===403);
+    if(res.ok){ const j = await res.json();
+      try{ const parsed = JSON.parse(b64d(j.content)); if(parsed && parsed.items) T = parsed; }catch(e){} }
+  }catch(e){}
+  const p = lsJson("fd_pending", null);
+  if(p && typeof p==="object"){ Object.assign(T.items, p); Object.keys(p).forEach(k=>tDirty.add(k)); }
+  syncState = tok() ? (bad ? "badtoken" : (tDirty.size ? "dirty" : "ok")) : "readonly";
+  setSync(); renderAll();
 }
-document.querySelectorAll("th[data-k]").forEach(th=>{
-  const btn=document.createElement("button");
-  btn.className="thbtn"; btn.type="button";
-  btn.innerHTML=th.textContent+' <span class="si" aria-hidden="true">\u25b3</span>';
-  th.textContent=""; th.appendChild(btn);
-  btn.addEventListener("click",()=>{
-    const k=th.dataset.k; if(k===sortKey)asc=!asc; else{sortKey=k;asc=(k!=="fit");}
-    sortRows();
-    document.getElementById("sortAnnounce").textContent=`Sorted by ${SORT_LABEL[sortKey]}, ${asc?"ascending":"descending"}`;
-  });
-});
-tb.addEventListener("click",e=>{
-  const btn=e.target.closest(".exp"); if(!btn)return;
-  const tr=btn.closest("tr"), open=btn.getAttribute("aria-expanded")==="true";
-  if(open){ tr.nextElementSibling?.classList.contains("detail")&&tr.nextElementSibling.remove(); btn.setAttribute("aria-expanded","false"); btn.textContent="\u25b8"; }
-  else{
-    const r=DATA[+tr.dataset.i];
-    tr.insertAdjacentHTML("afterend",`<tr class="detail"><td colspan="11">${r.summary}</td></tr>`);
-    btn.setAttribute("aria-expanded","true"); btn.textContent="\u25be";
+async function syncNow(){
+  if(!tok()){ setSync(); return; }
+  if(!tDirty.size){ syncState="ok"; setSync(); return; }
+  syncState = "saving"; setSync();
+  // Snapshot what this attempt sends: edits made while the PUT is in flight stay dirty
+  // and re-sync afterwards.
+  const sentKeys = [...tDirty];
+  try{
+    const h = {Accept:"application/vnd.github+json", Authorization:"Bearer "+tok()};
+    let base = {items:{}}, sha = null;
+    const cur = await fetch(TRIAGE_API, {headers:h});
+    if(cur.status===401 || cur.status===403){ syncState="badtoken"; setSync(); return; }
+    if(cur.ok){ const j = await cur.json(); sha = j.sha;
+      let parsed = null;
+      try{ parsed = JSON.parse(b64d(j.content)); }catch(e){}
+      if(parsed && parsed.items){ base = parsed; }
+      else { syncState="error"; setSync(); return; } // never overwrite a team file we couldn't read
+    }
+    for(const k of sentKeys) base.items[k] = T.items[k];
+    base.updated = new Date().toISOString();
+    const body = {message:"triage: update via dashboard"+(who()?" ("+who()+")":""),
+                  content: b64e(JSON.stringify(base,null,1))};
+    if(sha) body.sha = sha;
+    const put = await fetch(TRIAGE_API, {method:"PUT",
+      headers:{...h,"Content-Type":"application/json"}, body: JSON.stringify(body)});
+    if(put.ok){
+      putFails = 0;
+      const still = new Set([...tDirty].filter(k=>!sentKeys.includes(k)));
+      const keep = {}; for(const k of still) keep[k] = T.items[k];
+      T = base; Object.assign(T.items, keep); tDirty = still;
+      if(tDirty.size){
+        lsSet("fd_pending", JSON.stringify(Object.fromEntries([...tDirty].map(k=>[k,T.items[k]]))));
+        syncState="dirty"; schedSync();
+      } else { lsDel("fd_pending"); syncState="ok"; }
+    }
+    else if(put.status===409 || put.status===422){
+      if(++putFails<=3){ syncState="dirty"; schedSync(); } else { syncState="error"; }
+    }
+    else if(put.status===401 || put.status===403){ syncState="badtoken"; }
+    else { syncState="error"; }
+  }catch(e){ syncState="error"; }
+  setSync();
+}
+function schedSync(){ clearTimeout(tTimer); tTimer = setTimeout(syncNow, 2500); }
+function setSync(){
+  const el = document.getElementById("syncchip"); if(!el) return;
+  const m = {
+    loading:  ["…","","Loading team notes"],
+    readonly: ["Team notes: viewing","","Viewing shared notes — click to enable saving"],
+    ok:       ["Team sync ✓","st-ok","All changes saved for the team"],
+    dirty:    [tDirty.size+" unsaved","st-warn","Changes not yet saved — click for help"],
+    saving:   ["Saving…","st-warn","Saving to the team file"],
+    badtoken: ["Save key invalid","st-err","Your save key was rejected — click to fix"],
+    error:    ["Sync error","st-err","Couldn't reach GitHub — will retry on next change"],
+  }[syncState]||["…","",""];
+  el.innerHTML = `<span class="${m[1]}">${m[0]}</span>`; el.title = m[2];
+  announce("Sync: "+m[0]);
+}
+
+// ── Labels ──
+const REC_LABEL = {GO:"Go", HR:"Review", QUALIFY:"Qualify", WATCH:"Watch", NO_GO:"No-go"};
+const GROUPS = [
+  ["GO","Go — pursue now"],
+  ["HR","Human review — needs a call"],
+  ["QUALIFY","Qualify — resolve the named unknown, then pursue"],
+  ["WATCH","Watch — monitor"],
+  ["NO_GO","Screened out — audit trail"]];
+const INST_LABEL = {GRANT:["Grant","Competitive grant or formula subgrant"],
+  CONTRACT:["Contract","Procurement: RFP / RFQ / RFI"],
+  COOP:["Co-op","Cooperative agreement or co-op purchasing vehicle"],
+  PASSTHRU:["Pass-through","Scholarship or stipend pass-through — low net to Relay"],
+  OTHER:["Other","Unclassified instrument"]};
+const instBucket = s => { s=String(s||"").toLowerCase();
+  if(/co-?op/.test(s)) return "COOP";
+  if(/contract|rfi|rfq/.test(s)) return "CONTRACT";
+  if(/pass-through|scholarship|stipend/.test(s)) return "PASSTHRU";
+  if(/grant|nofo/.test(s)) return "GRANT";
+  return "OTHER"; };
+DATA.forEach(r=>{ r._cls = instBucket(r.inst); });
+const TIER_LABEL = {federal:"Federal", state:"State", district:"District"};
+const tierOf = r => r.tier || (/grants\.gov|register|fed\.\s*reg|\bFR\b/i.test(r.source||"") ? "federal" : "state");
+
+// ── App state ──
+let state = {view:"feed", cls:null, jur:null, q:"", sel:-1};
+let collapsed = new Set(Array.isArray(lsJson("fd2_collapsed",null))?lsJson("fd2_collapsed",null):["NO_GO"]);
+const keysOn = () => lsGet("fd2_keys","on")!=="off";
+const esc = s => String(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const announce = s => { const el=document.getElementById("announce"); if(el) el.textContent = s; };
+const reduced = () => matchMedia("(prefers-reduced-motion:reduce)").matches;
+function rerender(fn){
+  if(document.startViewTransition && !reduced()){ document.startViewTransition(fn); } else { fn(); }
+}
+
+function fmtDue(r, long=false){
+  if(r.days===null||r.days===undefined||r.days==="") return "";
+  if(r.days<0) return `<span class="due ok">window closed</span>`;
+  const c = r.days<=5?"crit":(r.days<=15?"warn":"ok");
+  return `<span class="due num ${c}">${long?"closes ":""}${esc(r.close)} · ${r.days} bd</span>`;
+}
+function pills(r, inPanel=false){
+  const [il,gloss] = INST_LABEL[r._cls]||[r.inst,""];
+  return `<span class="pill p-${esc(r.rec)}">${esc(REC_LABEL[r.rec]||r.rec)}</span>
+    <span class="chip">${esc(TIER_LABEL[tierOf(r)]||tierOf(r))}</span>
+    <span class="chip" title="${esc(gloss)}">${esc(il)}</span>
+    ${r.status?`<span class="badge-new">${r.status==="NEW"?"New":"Updated"}</span>`:""}`;
+}
+
+function filtered(){
+  let rows = DATA.slice();
+  if(state.view==="windows") rows = rows.filter(r=>typeof r.days==="number"&&r.days>=0);
+  if(state.view==="starred") rows = rows.filter(r=>tGet(r).star);
+  if(state.view==="dismissed") rows = rows.filter(r=>tGet(r).dismissed);
+  else rows = rows.filter(r=>!tGet(r).dismissed);
+  if(state.cls) rows = rows.filter(r=>r._cls===state.cls);
+  if(state.jur) rows = rows.filter(r=>tierOf(r)===state.jur);
+  if(state.q){
+    const q = state.q.toLowerCase();
+    rows = rows.filter(r=>(r.title+" "+r.summary+" "+(r.path||"")+" "+(r.source||"")+" "+(r.inst||"")+" "+(r.net||"")+" "+(tGet(r).note||"")).toLowerCase().includes(q));
   }
-});
-const nogoBtn=document.getElementById("nogoBtn");
-function nogoLabel(){
-  const n=DATA.filter(r=>r.rec==="NO_GO"&&(tierFilter==="all"||tierOf(r)===tierFilter)).length;
-  nogoBtn.textContent=(showNoGo?"Hide":"Show")+` ${n} screened-out (audit trail)`;
-  nogoBtn.setAttribute("aria-pressed",String(showNoGo));
+  return rows;
 }
-nogoBtn.addEventListener("click",()=>{showNoGo=!showNoGo;nogoLabel();sortRows();});
-document.querySelectorAll("#tierbar button[data-tier]").forEach(b=>b.addEventListener("click",()=>{
-  tierFilter=b.dataset.tier;
-  document.querySelectorAll("#tierbar button[data-tier]").forEach(x=>x.classList.toggle("on",x===b));
-  nogoLabel(); sortRows();
-}));
-nogoLabel(); sortRows();
+function visibleRows(){
+  return [...document.querySelectorAll("#feed .row")].map(el=>+el.dataset.i);
+}
+
+function rowHtml(r){
+  const t = tGet(r), i = DATA.indexOf(r);
+  const unread = !READ.has(iid(r));
+  // Grouped feed: the group header already names the recommendation — repeating a pill
+  // per row is noise. Flat views (windows/starred/dismissed) mix recs, so they carry a
+  // compact mark: Go/Review keep their pills (the act-now states), the rest are text.
+  const flat = state.view!=="feed";
+  const mark = !flat ? "" :
+    (r.rec==="GO"||r.rec==="HR" ? `<span class="pill p-${esc(r.rec)}">${esc(REC_LABEL[r.rec])}</span>`
+                   : `<span class="tier tier-${esc(r.rec)}">${esc(REC_LABEL[r.rec]||r.rec)}</span>`);
+  const il = (INST_LABEL[r._cls]||[r.inst])[0];
+  return `<article class="row ${t.dismissed?"dim":""} ${state.sel===i?"sel":""}" tabindex="0"
+      data-i="${i}" style="view-transition-name:${iid(r)}" aria-label="${esc(r.title)}. Press Enter for details.">
+    <div class="l1">
+      ${unread?'<span class="unread" title="Unread"><span class="sr-only">Unread.</span></span>':""}
+      ${mark}
+      ${r.status?`<span class="badge-new">${r.status==="NEW"?"New":"Updated"}</span>`:""}
+      <span class="title ${unread?"unread-t":""}">${esc(r.title)}</span>
+      <span class="meta">
+        ${fmtDue(r)}
+        ${t.note?'<span class="noteic" title="Has a team note">✎</span>':""}
+        <span class="mtx">${esc(TIER_LABEL[tierOf(r)]==="Federal"?"Fed":TIER_LABEL[tierOf(r)])} · ${esc(il)}</span>
+        <span class="impn num" title="Fit score">${r.fit??""}</span>
+        <button class="starbtn ${t.star?"on":""}" data-star="${i}" aria-label="${t.star?"Unstar":"Star for team"}">${t.star?"★":"☆"}</button>
+      </span>
+    </div>
+    <p class="l2">${esc(r.summary)}</p>
+  </article>`;
+}
+
+function renderVerdict(){
+  // Verdict states facts about THE SCAN (full DATA), never the undismissed queue —
+  // dismissing the last pursue item must not manufacture an all-clear.
+  const act = DATA.filter(r=>r.rec==="GO"||r.rec==="HR").length;
+  const qual = DATA.filter(r=>r.rec==="QUALIFY").length;
+  const wins = DATA.filter(r=>typeof r.days==="number"&&r.days>=0).sort((a,b)=>a.days-b.days);
+  const dz = DATA.filter(r=>tGet(r).dismissed).length;
+  const gen = (META.updated||"").split("·")[0].trim();
+  const soon = wins[0];
+  const soonCls = soon ? (soon.days<=5?"crit":soon.days<=15?"warn":"") : "";
+  document.getElementById("verdict").innerHTML = `
+    <div class="verdict ${act?"alert":""}" role="status">
+      <span class="lead">${act
+        ? `${act} item${act===1?"":"s"} need${act===1?"s":""} a decision`
+        : qual ? `No decision-critical items · ${qual} qualify pursuit${qual===1?"":"s"} open`
+               : `No live pursuits this scan`}</span>
+      <button class="vchip num" data-goto="windows"><b>${wins.length}</b> window${wins.length===1?"":"s"} open${
+        soon?` · <span class="${soonCls}">soonest ${esc(soon.close)} (${soon.days} bd)</span>`:""}</button>
+      <button class="vchip num" data-goto="hypo"><b>${HYPOTHESES.length}</b> hypotheses</button>
+      <button class="vchip num" data-goto="feed"><b>${DATA.length}</b> items${dz?` · ${dz} dismissed`:""}</button>
+      <span class="gen num">generated ${esc(gen)}</span>
+    </div>`;
+  const ms = document.getElementById("mobilestats");
+  if(ms) ms.innerHTML = wins.slice(0,3).map(r=>{
+    const c = r.days<=5?"crit":(r.days<=15?"warn":"ok");
+    return `<button class="vchip num" data-open="${DATA.indexOf(r)}"><span class="${c}">${r.days} bd</span> ${esc(r.title.slice(0,40))}…</button>`;
+  }).join("");
+  // stale-data banner (bounded verdict support)
+  const sb = document.getElementById("stalebox");
+  const m = gen.match(/(\d{4})-(\d{2})-(\d{2})/);
+  if(m){
+    const age = (Date.now() - new Date(+m[1],+m[2]-1,+m[3]).getTime())/864e5;
+    sb.innerHTML = age>9 ? `<div class="stale">This scan is ${Math.floor(age)} days old — the weekly run may not have happened. Treat the verdict as stale.</div>` : "";
+  }
+}
+
+// ── Hypotheses view (Stream 2) ──
+function renderHypo(el){
+  el.innerHTML = HYPOTHESES.map(h=>`<article class="arch">
+    <div class="archhead"><span class="at">${esc(h.title)}</span></div>
+    <div class="hypobody">${esc(h.body)}</div>
+    <div class="hypometa">
+      <span class="k">Signal</span><span>${esc(h.signal)}</span>
+      <span class="k">Window</span><span class="warncol">${esc(h.by)}</span>
+      <span class="k">Owner</span><span>${esc(h.owner)}</span>
+    </div>
+  </article>`).join("") +
+  `<div class="archnote">Partnership hypotheses are cultivation signals, not pursuable opportunities —
+    Relay cannot apply directly; the play is vendor cultivation with the named operator. They are kept
+    out of the opportunity feed by design.</div>`;
+  document.getElementById("vtitle").textContent = "Hypotheses";
+  document.getElementById("vcount").textContent = HYPOTHESES.length + " standing";
+  document.getElementById("vsub").textContent =
+    "Stream 2 — districts and operators whose funded work could flow to Relay as vendor dollars, with the cultivation window for each.";
+  announce(HYPOTHESES.length+" hypotheses shown");
+}
+
+function renderFeed(){
+  const el = document.getElementById("feed");
+  if(state.view==="hypo"){ renderHypo(el); return; }
+  const rows = filtered();
+  let html = "";
+  if(state.view==="windows"){
+    const sorted = rows.slice().sort((a,b)=>(a.days??9e9)-(b.days??9e9));
+    html = `<div class="rows">${sorted.map(rowHtml).join("")}</div>`;
+  } else if(state.view!=="feed"){
+    html = rows.length?`<div class="rows">${rows.map(rowHtml).join("")}</div>`:"";
+  } else {
+    for(const [rec,label] of GROUPS){
+      const g = rows.filter(r=>r.rec===rec).sort((a,b)=>(b.fit||0)-(a.fit||0));
+      if(!g.length) continue;
+      const closed = collapsed.has(rec);
+      html += `<div class="group ${closed?"closed":""}">
+          <button data-grp="${rec}" aria-expanded="${!closed}"><span class="car">▾</span> ${label}
+          <span class="n num">${g.length}</span><span class="rule"></span></button></div>`;
+      if(!closed) html += `<div class="rows">${g.map(rowHtml).join("")}</div>`;
+    }
+  }
+  el.innerHTML = html || `<div class="emptyview">Nothing matches — clear filters or search.<br><br>
+    ${DATA.length?"":"Run <code>/relay-grants</code> to populate the board."}</div>`;
+  const titles = {feed:"Feed", windows:"Closing windows", starred:"Starred", dismissed:"Dismissed"};
+  document.getElementById("vtitle").textContent =
+    state.jur ? (TIER_LABEL[state.jur]||state.jur)+" · "+(titles[state.view]||"Feed")
+              : state.cls ? (INST_LABEL[state.cls]?.[0]||state.cls)+" · "+(titles[state.view]||"Feed")
+              : titles[state.view]||"Feed";
+  document.getElementById("vcount").textContent = rows.length + " item" + (rows.length===1?"":"s");
+  document.getElementById("vsub").textContent = {
+    feed:"Every opportunity surfaced across runs, grouped by recommendation, ranked by fit. Screened-out items stay collapsed as the audit trail.",
+    windows:"Open application and bid windows, soonest first. Amber ≤15 business days, red ≤5 (team convention).",
+    starred:"Items the team has starred. Stars sync through the dashboard's GitHub home.",
+    dismissed:"Items the team dismissed — hidden from other views, restorable here or from the panel."
+  }[state.view]||"";
+  announce(rows.length+" items shown");
+}
+
+function navBtn(label, key, val, count){
+  const on = (key==="view" && state.view===val) || (key==="cls" && (state.cls||"")===val) || (key==="jur" && (state.jur||"")===val);
+  return `<button data-k="${esc(key)}" data-v="${esc(val)}" class="${on?"on":""}" aria-pressed="${on}">
+    ${esc(label)}${count!==undefined?`<span class="n num">${esc(String(count))}</span>`:""}</button>`;
+}
+function renderNav(){
+  const w = DATA.filter(r=>typeof r.days==="number"&&r.days>=0).length;
+  const st = DATA.filter(r=>tGet(r).star).length;
+  const dz = DATA.filter(r=>tGet(r).dismissed).length;
+  document.getElementById("viewnav").innerHTML =
+    navBtn("Feed","view","feed",DATA.filter(r=>!tGet(r).dismissed).length) +
+    navBtn("Closing windows","view","windows",w) +
+    navBtn("Hypotheses","view","hypo",HYPOTHESES.length) +
+    navBtn("★ Starred","view","starred",st) +
+    (dz?navBtn("Dismissed","view","dismissed",dz):"");
+  document.getElementById("clsnav").innerHTML =
+    navBtn("All instruments","cls","",undefined) +
+    Object.keys(INST_LABEL).map(c=>{
+      const n = DATA.filter(r=>r._cls===c).length;
+      return n?navBtn(INST_LABEL[c][0],"cls",c,n):"";
+    }).join("");
+  document.getElementById("jurnav").innerHTML =
+    navBtn("All tiers","jur","",undefined) +
+    ["federal","state","district"].map(j=>{
+      const n = DATA.filter(r=>tierOf(r)===j).length;
+      return n?navBtn(TIER_LABEL[j],"jur",j,n):"";
+    }).join("");
+}
+
+function renderRail(){
+  const wins = DATA.filter(r=>typeof r.days==="number"&&r.days>=0)
+                   .sort((a,b)=>a.days-b.days).slice(0,8);
+  document.getElementById("windows").innerHTML = wins.length ? wins.map(r=>{
+    const c = r.days<=5?"var(--urgent)":(r.days<=15?"var(--warn)":"var(--ink)");
+    return `<div class="wline" data-i="${DATA.indexOf(r)}" tabindex="0" role="button">
+      <span class="d num"><b style="color:${c}">${r.days}</b><span>bd</span></span>
+      <span class="t">${esc(r.title.slice(0,80))}</span></div>`;
+  }).join("") : `<div class="railnote">No open windows.</div>`;
+  const pursue = DATA.filter(r=>r.rec!=="NO_GO"&&r.rec!=="WATCH"&&!tGet(r).dismissed)
+                     .sort((a,b)=>(b.fit||0)-(a.fit||0)).slice(0,6);
+  document.getElementById("pursuelist").innerHTML = pursue.length ? pursue.map(r=>
+    `<div class="wline" data-i="${DATA.indexOf(r)}" tabindex="0" role="button">
+      <span class="d num"><b>${r.fit??"—"}</b><span>fit</span></span>
+      <span class="t">${esc(r.title.slice(0,80))}<br><small>${esc(r.path||"")}</small></span>
+    </div>`).join("") : `<div class="railnote">Nothing to pursue this run.</div>`;
+}
+
+function renderAll(){ renderNav(); renderVerdict(); renderFeed(); renderRail(); }
+
+// ── Dialog manager: one dialog at a time; background inert while any is open;
+//    focus restored on close ──
+let lastFocus = null;
+function setBgInert(on){
+  const layout = document.getElementById("layout"), tb = document.querySelector(".topbar");
+  if(on){ layout.setAttribute("inert",""); tb.setAttribute("inert",""); }
+  else { layout.removeAttribute("inert"); tb.removeAttribute("inert"); }
+}
+function anyModalOpen(){
+  return document.getElementById("panel").classList.contains("open")
+    || document.getElementById("helpscrim").classList.contains("open")
+    || document.getElementById("palscrim").classList.contains("open");
+}
+function eligHtml(r){
+  const cls = r.elig==="No"?"critcol":(r.elig==="Low"||r.eligWarn)?"warncol":"";
+  return `<span class="${cls}">${esc(r.elig||"—")}</span>${r.eligWarn&&r.elig!=="No"?' <span class="warncol">⚠</span>':""}`;
+}
+function openPanel(i){
+  const r = DATA[i]; if(!r) return;
+  closeHelp(); closePal();
+  markRead(r);
+  const t = tGet(r);
+  state.sel = i;
+  lastFocus = document.activeElement;
+  document.getElementById("ppills").innerHTML = pills(r, true);
+  document.getElementById("ptitle").textContent = r.title;
+  const attrib = (t.by||t.at)?`<div class="attrib">Last touched${t.by?" by "+esc(t.by):""}${t.at?" · "+esc(t.at.slice(0,10)):""}</div>`:"";
+  const netCls = r.netWarn||/pass-through|⚠/.test(r.net||"") ? "warncol" : "";
+  const effCls = r.effort==="Very High" ? "warncol" : "";
+  document.getElementById("pbody").innerHTML = `
+    <div class="impactbig"><span class="n num">${r.fit??"—"}</span><span class="lb">Fit</span>
+      <span class="bar"><i style="width:${Math.min(100,r.fit||0)}%"></i></span></div>
+    <div class="actions">
+      <button class="btn" id="pstar" data-i="${i}">${t.star?"★ Unstar":"☆ Star for team"}</button>
+      <button class="btn" id="pdismiss" data-i="${i}">${t.dismissed?"↩ Restore":"Dismiss"}</button>
+    </div>
+    <dl class="kv">
+      ${r.path?`<dt>Next step</dt><dd class="angle">${esc(r.path)}</dd>`:""}
+      <dt>Summary</dt><dd>${esc(r.summary)}</dd>
+      <dt>Eligibility</dt><dd>${eligHtml(r)}</dd>
+      <dt>Net to Relay</dt><dd class="${netCls}">${esc(r.net||"—")}</dd>
+      <dt>Instrument</dt><dd>${esc(r.inst||"—")}</dd>
+      <dt>Effort</dt><dd class="${effCls}">${esc(r.effort||"—")}</dd>
+      <dt>Close</dt><dd>${r.days!=null?fmtDue(r,true):esc(r.close||"—")}</dd>
+      <dt>Source</dt><dd>${esc(r.source)}</dd>
+      <dt>Team note</dt><dd>
+        <textarea class="notebox" id="pnote" placeholder="Add a note for the team — visible to anyone who can see this dashboard">${esc(t.note||"")}</textarea>
+        <div class="actions"><button class="btn primary" id="psavenote" data-i="${i}">Save note</button></div>
+        ${attrib}
+      </dd>
+    </dl>
+    <div class="actions">
+      ${safeUrl(r.url)?`<a class="btn primary" href="${esc(safeUrl(r.url))}" target="_blank" rel="noopener">Open opportunity ↗</a>`:""}
+    </div>
+    <div class="verified">Amounts, deadlines &amp; eligibility verified from primary sources on the run date; fields left unverified are labeled. Scored per the <a href="rubric.html">scoring rubric</a>.</div>`;
+  const panel = document.getElementById("panel");
+  panel.removeAttribute("inert");
+  panel.classList.add("open");
+  // Inline mount: the panel expands beneath its row; no scrim, no background inert —
+  // clicking another row simply moves the expansion there.
+  document.querySelectorAll("#feed .row.openrow").forEach(el=>el.classList.remove("openrow"));
+  const prow = document.querySelector(`#feed .row[data-i="${i}"]`);
+  if(prow){ prow.classList.add("openrow"); prow.after(panel); }
+  else document.body.appendChild(panel);
+  document.getElementById("pclose").focus({preventScroll:true});
+}
+function closePanel(){
+  const panel = document.getElementById("panel");
+  const was = panel.classList.contains("open");
+  panel.classList.remove("open");
+  panel.setAttribute("inert","");  // closed panel must not be tab-reachable
+  document.querySelectorAll("#feed .row.openrow").forEach(el=>el.classList.remove("openrow"));
+  if(panel.parentElement !== document.body) document.body.appendChild(panel);
+  document.getElementById("scrim").classList.remove("open");
+  setBgInert(false);
+  if(was){
+    renderAll();
+    // renderAll replaces the row lastFocus pointed at; re-acquire by item index
+    const el = document.querySelector(`#feed .row[data-i="${state.sel}"]`);
+    if(el) el.focus();
+    else if(lastFocus && document.contains(lastFocus)) lastFocus.focus();
+  }
+}
+function closeHelp(){
+  const hs = document.getElementById("helpscrim");
+  if(!hs.classList.contains("open")) return;
+  hs.classList.remove("open");
+  if(!anyModalOpen()) setBgInert(false);
+  const hb = document.getElementById("helpbtn"); if(hb) hb.focus();
+}
+
+// ── Toast with undo ──
+let toastTimer = null, undoFn = null;
+function toast(msg, undo){
+  const el = document.getElementById("toast");
+  undoFn = undo||null;
+  el.innerHTML = `<span>${esc(msg)}</span>${undo?'<button id="undobtn">Undo</button>':""}`;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ el.classList.remove("show"); undoFn=null; }, 6000);
+}
+
+// ── Command palette ──
+let palSel = 0;
+function palItems(q){
+  q = q.toLowerCase();
+  const items = [];
+  const views = [["Feed","feed"],["Closing windows","windows"],["Hypotheses","hypo"],["Starred","starred"],["Dismissed","dismissed"]];
+  for(const [l,v] of views) items.push({label:"Go to "+l, k:"view", act:()=>{state.view=v;}});
+  for(const c of Object.keys(INST_LABEL)) items.push({label:"Filter: "+INST_LABEL[c][0], k:"instrument", act:()=>{state.cls=c;}});
+  for(const j of ["federal","state","district"]) items.push({label:"Filter: "+TIER_LABEL[j], k:"tier", act:()=>{state.jur=j;}});
+  items.push({label:"Clear filters", k:"filters", act:()=>{state.cls=null;state.jur=null;state.q="";document.getElementById("q").value="";}});
+  items.push({label:"Toggle theme", k:"theme", act:toggleTheme});
+  for(const r of DATA) items.push({label:r.title, k:esc(TIER_LABEL[tierOf(r)]), act:()=>openPanel(DATA.indexOf(r)), open:true});
+  return q ? items.filter(x=>x.label.toLowerCase().includes(q)).slice(0,9) : items.slice(0,9);
+}
+function renderPal(){
+  const q = document.getElementById("palq").value.trim();
+  const items = palItems(q);
+  palSel = Math.max(0, Math.min(palSel, items.length-1));
+  document.getElementById("pallist").innerHTML = items.length ? items.map((x,i)=>
+    `<div class="it ${i===palSel?"sel":""}" data-pi="${i}" role="option" aria-selected="${i===palSel}">${esc(x.label)}<span class="k">${x.k}</span></div>`
+  ).join("") : `<div class="none">No matches.</div>`;
+}
+function palRun(i){
+  const items = palItems(document.getElementById("palq").value.trim());
+  const x = items[i]; if(!x) return;
+  closePal();
+  if(x.open){ x.act(); } else { x.act(); rerender(renderAll); }
+}
+let palLastFocus = null;
+function openPal(){
+  if(document.getElementById("panel").classList.contains("open")) closePanel();
+  closeHelp();
+  palLastFocus = document.activeElement;
+  document.getElementById("palscrim").classList.add("open");
+  setBgInert(true);
+  const q=document.getElementById("palq"); q.value=""; palSel=0; renderPal(); q.focus(); }
+function closePal(){
+  const ps = document.getElementById("palscrim");
+  if(!ps.classList.contains("open")) return;
+  ps.classList.remove("open");
+  if(!anyModalOpen()) setBgInert(false);
+  if(palLastFocus && document.contains(palLastFocus)) palLastFocus.focus(); }
+
+function toggleTheme(){
+  const root = document.documentElement;
+  const dark = matchMedia("(prefers-color-scheme:dark)").matches;
+  const curr = root.dataset.theme || (dark?"dark":"light");
+  root.dataset.theme = curr==="dark"?"light":"dark";
+}
+
+// ── Selection (arrow-key traversal, single-letter verbs act on selection only) ──
+function moveSel(delta){
+  const vis = visibleRows();
+  if(!vis.length) return;
+  let pos = vis.indexOf(state.sel);
+  pos = pos<0 ? (delta>0?0:vis.length-1) : Math.max(0, Math.min(vis.length-1, pos+delta));
+  state.sel = vis[pos];
+  document.querySelectorAll("#feed .row.sel").forEach(el=>el.classList.remove("sel"));
+  const el = document.querySelector(`#feed .row[data-i="${state.sel}"]`);
+  if(el){ el.classList.add("sel"); el.scrollIntoView({block:"nearest"}); el.focus({preventScroll:true}); }
+}
+
+// ── Events ──
+function openHelp(){
+  if(document.getElementById("panel").classList.contains("open")) closePanel();
+  closePal();
+  document.getElementById("whoin").value = who();
+  document.getElementById("tokin").value = tok();
+  document.getElementById("keystoggle").checked = keysOn();
+  document.getElementById("settingsmsg").textContent = "";
+  document.getElementById("helpscrim").classList.add("open");
+  setBgInert(true);
+  document.getElementById("helpclose").focus();
+}
+document.addEventListener("click", e=>{
+  const sb = e.target.closest(".starbtn");
+  if(sb){ e.stopPropagation(); const r = DATA[+sb.dataset.star];
+    tSet(r, {star: !tGet(r).star}); renderAll(); return; }
+  const nb = e.target.closest(".nav button");
+  if(nb){
+    const k = nb.dataset.k, v = nb.dataset.v;
+    rerender(()=>{
+      if(k==="view") state.view = v;
+      if(k==="cls") state.cls = v||null;
+      if(k==="jur") state.jur = v||null;
+      state.sel = -1; renderNav(); renderFeed();
+    });
+    if(window.innerWidth<=760) document.getElementById("side").classList.remove("open");
+    return;
+  }
+  const grp = e.target.closest("[data-grp]");
+  if(grp){ const g = grp.dataset.grp;
+    collapsed.has(g)?collapsed.delete(g):collapsed.add(g);
+    lsSet("fd2_collapsed", JSON.stringify([...collapsed]));
+    rerender(renderFeed); return; }
+  const vc = e.target.closest("[data-goto]");
+  if(vc){ rerender(()=>{ state.view = vc.dataset.goto; state.sel=-1; renderNav(); renderFeed(); }); return; }
+  const vo = e.target.closest("[data-open]");
+  if(vo){ openPanel(+vo.dataset.open); return; }
+  if(e.target.id==="pstar"){ const r=DATA[+e.target.dataset.i];
+    tSet(r,{star:!tGet(r).star}); openPanel(+e.target.dataset.i); return; }
+  if(e.target.id==="pdismiss"){ const i=+e.target.dataset.i; const r=DATA[i];
+    const was = !!tGet(r).dismissed;
+    tSet(r,{dismissed:!was}); closePanel();
+    if(!was) toast("Dismissed “"+r.title.slice(0,50)+"…”", ()=>{ tSet(r,{dismissed:false}); renderAll(); });
+    return; }
+  if(e.target.id==="psavenote"){ const r=DATA[+e.target.dataset.i];
+    tSet(r,{note:document.getElementById("pnote").value.slice(0,1000)});
+    e.target.textContent="Saved ✓"; setTimeout(()=>{e.target.textContent="Save note";},1500); return; }
+  if(e.target.id==="undobtn"){ if(undoFn) undoFn(); document.getElementById("toast").classList.remove("show"); undoFn=null; return; }
+  if(e.target.id==="syncchip"||e.target.id==="helpbtn"){ openHelp(); return; }
+  if(e.target.id==="helpclose"||e.target.id==="helpscrim"){ closeHelp(); return; }
+  if(e.target.id==="keystoggle"){ lsSet("fd2_keys", e.target.checked?"on":"off"); return; }
+  if(e.target.id==="savesettings"){
+    const n=document.getElementById("whoin").value.trim(), k=document.getElementById("tokin").value.trim();
+    if(n) lsSet("fd_name",n);
+    if(k) lsSet("fd_token",k);
+    syncState = tok() ? (tDirty.size?"dirty":"ok") : "readonly"; setSync();
+    document.getElementById("settingsmsg").textContent = tok()
+      ? "Saved. Your changes will now sync for the team." : "Saved your name. Add a save key to sync changes.";
+    if(tok()&&tDirty.size) syncNow();
+    return; }
+  if(e.target.id==="syncnowbtn"){ syncNow(); document.getElementById("settingsmsg").textContent="Syncing…"; return; }
+  if(e.target.id==="exportbtn"){
+    navigator.clipboard.writeText(JSON.stringify(Object.fromEntries([...tDirty].map(k=>[k,T.items[k]])),null,1));
+    document.getElementById("settingsmsg").textContent="Unsaved changes copied — paste them to whoever runs the weekly update."; return; }
+  if(e.target.id==="cleartok"){ lsDel("fd_token");
+    document.getElementById("tokin").value="";
+    syncState="readonly"; setSync();
+    document.getElementById("settingsmsg").textContent="Save key forgotten on this browser."; return; }
+  const pi = e.target.closest("[data-pi]");
+  if(pi){ palRun(+pi.dataset.pi); return; }
+  if(e.target.id==="palscrim"){ closePal(); return; }
+  const c = e.target.closest("[data-i]");
+  if(c && (c.classList.contains("row")||c.classList.contains("wline"))){
+    if(c.classList.contains("openrow")){ closePanel(); return; }
+    state.sel=+c.dataset.i; openPanel(+c.dataset.i); return; }
+  if(e.target.id==="scrim"||e.target.id==="pclose"||e.target.closest("#pclose")){ closePanel(); return; }
+  if(e.target.id==="menubtn"){ document.getElementById("side").classList.toggle("open"); return; }
+  if(e.target.id==="themebtn"){ toggleTheme(); return; }
+});
+
+document.addEventListener("keydown", e=>{
+  const typing = ["INPUT","TEXTAREA","SELECT"].includes(document.activeElement.tagName) ||
+                 document.activeElement.isContentEditable;
+  const palOpen = document.getElementById("palscrim").classList.contains("open");
+  // Palette keys
+  if((e.metaKey||e.ctrlKey) && e.key.toLowerCase()==="k"){ e.preventDefault(); palOpen?closePal():openPal(); return; }
+  if(palOpen){
+    if(e.key==="Escape"){ closePal(); return; }
+    if(e.key==="ArrowDown"){ e.preventDefault(); palSel++; renderPal(); return; }
+    if(e.key==="ArrowUp"){ e.preventDefault(); palSel=Math.max(0,palSel-1); renderPal(); return; }
+    if(e.key==="Enter"){ e.preventDefault(); palRun(palSel); return; }
+    return;
+  }
+  if(e.key==="Escape"){ closePanel(); closeHelp(); document.getElementById("side").classList.remove("open"); return; }
+  if(typing) return;
+  const panelOpen = document.getElementById("panel").classList.contains("open");
+  const helpOpen = document.getElementById("helpscrim").classList.contains("open");
+  // Standard keys (always on)
+  if(e.key==="ArrowDown"&&!panelOpen&&!helpOpen){ e.preventDefault(); moveSel(1); return; }
+  if(e.key==="ArrowUp"&&!panelOpen&&!helpOpen){ e.preventDefault(); moveSel(-1); return; }
+  if((e.key==="Enter"||e.key===" ") && document.activeElement.classList?.contains("row")){
+    e.preventDefault(); openPanel(+document.activeElement.dataset.i); return; }
+  if((e.key==="Enter"||e.key===" ") && document.activeElement.classList?.contains("wline")){
+    e.preventDefault(); openPanel(+document.activeElement.dataset.i); return; }
+  // Single-letter shortcuts (toggleable; act on selection only; suppressed while any
+  // dialog is open so they can't mutate hidden items; WCAG 2.1.4)
+  if(!keysOn()) return;
+  if(e.metaKey||e.ctrlKey||e.altKey) return;
+  if(helpOpen) return;
+  if(e.key==="/"){ e.preventDefault(); document.getElementById("q").focus(); return; }
+  if(e.key==="?"){ e.preventDefault(); openHelp(); return; }
+  if(panelOpen) return;
+  if(e.key==="j"||e.key==="J"){ moveSel(1); return; }
+  if(e.key==="k"||e.key==="K"){ moveSel(-1); return; }
+  // Validate the selection against what's actually visible before mutating (a stale
+  // index after a filter change must not act on a hidden item)
+  const vis = visibleRows();
+  if(!vis.includes(state.sel)) state.sel = vis.length ? vis[0] : -1;
+  const r = DATA[state.sel];
+  if(!r) return;
+  if(e.key==="s"||e.key==="S"){ tSet(r,{star:!tGet(r).star}); renderAll();
+    const el=document.querySelector(`#feed .row[data-i="${state.sel}"]`); if(el) el.focus(); return; }
+  if(e.key==="d"||e.key==="D"){
+    const pos = vis.indexOf(state.sel);
+    tSet(r,{dismissed:true}); renderAll();
+    const visA = visibleRows();
+    state.sel = visA.length ? visA[Math.min(Math.max(pos,0), visA.length-1)] : -1;
+    const el = state.sel>=0 ? document.querySelector(`#feed .row[data-i="${state.sel}"]`) : null;
+    if(el){ el.classList.add("sel"); el.focus(); }
+    toast("Dismissed “"+r.title.slice(0,50)+"…”", ()=>{ tSet(r,{dismissed:false}); renderAll(); });
+    return; }
+  if(e.key==="e"||e.key==="E"){ if(tGet(r).dismissed){ tSet(r,{dismissed:false}); renderAll(); } return; }
+});
+// Tab focus and the selection model stay in sync
+document.getElementById("feed").addEventListener("focusin", e=>{
+  const row = e.target.closest(".row");
+  if(row){ state.sel = +row.dataset.i;
+    document.querySelectorAll("#feed .row.sel").forEach(el=>el.classList.remove("sel"));
+    row.classList.add("sel"); }
+});
+document.getElementById("q").addEventListener("input", e=>{ state.q = e.target.value.trim(); state.sel=-1; renderFeed(); });
+document.getElementById("palq") && document.getElementById("palq").addEventListener("input", ()=>{ palSel=0; renderPal(); });
+
+// ── First render: entrance with capped stagger (≤250ms cumulative; removed after) ──
+document.getElementById("updated").textContent = META.updated ? "Updated "+META.updated : "Awaiting first run";
+// ── Inline-panel guard: feed rebuilds replace row nodes, so the panel is parked
+// on <body> during every renderFeed and re-mounted after. ──
+{ const _rf = renderFeed;
+  renderFeed = function(){
+    const panel = document.getElementById("panel");
+    if(panel.parentElement !== document.body) document.body.appendChild(panel);
+    _rf();
+    if(panel.classList.contains("open")){
+      const prow = document.querySelector(`#feed .row[data-i="${state.sel}"]`);
+      if(prow){ prow.classList.add("openrow"); prow.after(panel); }
+      else { panel.classList.remove("open"); panel.setAttribute("inert",""); }
+    }
+  };
+}
+renderAll(); setSync();
+if(!reduced()){
+  document.getElementById("feed").classList.add("entering");
+  document.querySelectorAll("#feed .row").forEach((el,i)=>{
+    el.style.setProperty("--d", Math.min(i*18,250)+"ms"); });
+  setTimeout(()=>document.getElementById("feed").classList.remove("entering"), 700);
+}
+loadTriage();
 </script>
 </body>
 </html>
