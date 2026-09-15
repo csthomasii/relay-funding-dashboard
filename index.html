@@ -14,7 +14,7 @@
      funding data model. The shell is hand-maintained: weekly runs edit the
      const DATA/HYPOTHESES/META blocks only — never rebuild this page. ── */
   :root{
-    --bg:#F9F8F4; --panel:#FFFFFF; --ink:#16181B; --muted:#4E555E; --faint:#8A9098;
+    --bg:#F9F8F4; --panel:#FFFFFF; --ink:#16181B; --muted:#4E555E; --faint:#656B74;
     --hair:#E4E2DC; --line:#C8C5BD; --chrome:#F1EFE9; --tint:#E9EDFA;
     --accent:#2447C5; --accent-ink:#1B3697; --accent-contrast:#FFFFFF;
     --rule:#16181B;
@@ -32,7 +32,7 @@
     --t-1:130ms; --t-2:200ms; --t-3:280ms;
   }
   @media (prefers-color-scheme:dark){:root{
-    --bg:#14161A; --panel:#191C21; --ink:#ECEAE4; --muted:#A8ACB2; --faint:#7A8088;
+    --bg:#14161A; --panel:#191C21; --ink:#ECEAE4; --muted:#A8ACB2; --faint:#8F959D;
     --hair:#262A30; --line:#464C54; --chrome:#1E2228; --tint:#1D2436;
     --accent:#8FA7F2; --accent-ink:#A9BCF5; --accent-contrast:#14161A;
     --rule:#ECEAE4;
@@ -44,7 +44,7 @@
     --sh-2:0 1px 2px rgba(0,0,0,.45),0 4px 12px rgba(0,0,0,.35);
     --sh-3:0 1px 2px rgba(0,0,0,.5),0 4px 14px rgba(0,0,0,.4),0 16px 36px rgba(0,0,0,.35)}}
   :root[data-theme="dark"]{
-    --bg:#14161A; --panel:#191C21; --ink:#ECEAE4; --muted:#A8ACB2; --faint:#7A8088;
+    --bg:#14161A; --panel:#191C21; --ink:#ECEAE4; --muted:#A8ACB2; --faint:#8F959D;
     --hair:#262A30; --line:#464C54; --chrome:#1E2228; --tint:#1D2436;
     --accent:#8FA7F2; --accent-ink:#A9BCF5; --accent-contrast:#14161A;
     --rule:#ECEAE4;
@@ -56,7 +56,7 @@
     --sh-2:0 1px 2px rgba(0,0,0,.45),0 4px 12px rgba(0,0,0,.35);
     --sh-3:0 1px 2px rgba(0,0,0,.5),0 4px 14px rgba(0,0,0,.4),0 16px 36px rgba(0,0,0,.35)}
   :root[data-theme="light"]{
-    --bg:#F9F8F4; --panel:#FFFFFF; --ink:#16181B; --muted:#4E555E; --faint:#8A9098;
+    --bg:#F9F8F4; --panel:#FFFFFF; --ink:#16181B; --muted:#4E555E; --faint:#656B74;
     --hair:#E4E2DC; --line:#C8C5BD; --chrome:#F1EFE9; --tint:#E9EDFA;
     --accent:#2447C5; --accent-ink:#1B3697; --accent-contrast:#FFFFFF;
     --rule:#16181B;
@@ -79,20 +79,21 @@
   /* ── Top utility bar ── */
   .topbar{position:fixed;top:0;left:0;right:0;height:48px;background:var(--bg);
     border-bottom:1px solid var(--hair);display:flex;align-items:center;gap:12px;padding:0 16px;z-index:40}
-  .brand{font-family:var(--mono);font-size:10.5px;font-weight:700;color:var(--ink);white-space:nowrap;
+  .brand{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink);white-space:nowrap;
     letter-spacing:.14em;text-transform:uppercase}
-  .brand .sub{font-family:var(--mono);color:var(--faint);font-weight:500;margin-left:8px;font-size:9.5px;
+  .brand .sub{font-family:var(--mono);color:var(--faint);font-weight:500;margin-left:8px;font-size:11px;
     letter-spacing:.1em;text-transform:uppercase}
-  .search{flex:1;max-width:440px;position:relative}
+  .search{flex:1 1 280px;min-width:180px;max-width:440px;position:relative}
   .search input{width:100%;height:30px;border:1px solid var(--line);border-radius:0;background:var(--panel);color:var(--ink);
-    padding:0 60px 0 28px;font-size:13px;outline:none;transition:border-color var(--t-1) var(--e-out)}
+    padding:0 40px 0 28px;font-size:13px;outline:none;transition:border-color var(--t-1) var(--e-out)}
   .search input:focus{border-color:var(--accent)}
   .search .ic{position:absolute;left:9px;top:6px;color:var(--faint);font-size:13px;pointer-events:none}
   .search .kbd{position:absolute;right:7px;top:5px}
   kbd{border:1px solid var(--hair);font-size:11px;color:var(--faint);padding:1px 5px;
     background:var(--chrome);font-family:var(--mono)}
   .topbar .spacer{flex:1}
-  .updated{font-family:var(--mono);font-size:11px;color:var(--faint);white-space:nowrap;letter-spacing:.03em}
+  .updated{font-family:var(--mono);font-size:11px;color:var(--faint);white-space:nowrap;letter-spacing:.03em;
+    min-width:0;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto}
   .iconbtn{border:1px solid var(--hair);background:var(--panel);color:var(--muted);height:30px;
     min-width:30px;padding:0 9px;cursor:pointer;font-size:13px;
     transition:color var(--t-1) var(--e-out),border-color var(--t-1) var(--e-out),transform var(--t-1) var(--e-out)}
@@ -121,7 +122,7 @@
   .nav button:hover{background:var(--chrome);color:var(--ink)}
   .nav button:active{transform:scale(.985)}
   .nav button.on{background:var(--tint);color:var(--accent-ink);font-weight:600;box-shadow:inset 2px 0 0 var(--accent)}
-  .nav .n{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--faint)}
+  .nav .n{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--faint)}
   .nav button.on .n{color:var(--accent-ink)}
   .side .foot{margin-top:22px;padding:12px 8px;font-family:var(--mono);font-size:11px;color:var(--faint);
     border-top:1px solid var(--hair);line-height:1.8;letter-spacing:.02em}
@@ -139,18 +140,19 @@
   .wline:hover{background:var(--tint)}
   .wline .d{flex:none;text-align:left;min-width:38px}
   .wline .d b{display:block;font-family:var(--mono);font-size:20px;line-height:1.05;font-weight:600;color:var(--accent-ink)}
-  .wline .d span{font-family:var(--mono);font-size:8px;color:var(--faint);letter-spacing:.08em;text-transform:uppercase}
+  .wline .d span{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.08em;text-transform:uppercase}
   .wline .t{font-size:11px;color:var(--muted);line-height:1.35}
   .wline .t small{font-family:var(--mono);color:var(--faint);font-size:11px}
   #pursuelist{display:flex;flex-direction:column;gap:2px}
   #pursuelist .wline{padding:3px 8px 3px 0}
-  .railnote{font-size:10.5px;color:var(--faint);padding:2px 0}
+  .railnote{font-size:11px;color:var(--faint);padding:2px 0}
+  .linkbtn{border:0;background:none;padding:0;font:inherit;color:var(--accent-ink);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
   .mobilestats{display:none}
 
   /* ── Main: editorial column ── */
   main{padding:22px clamp(18px,3vw,34px) 64px;min-width:0}
   .m-eyebrow{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
-    font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+    font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
   .m-eyebrow .m-scan{color:var(--accent-ink)}
   .m-title{font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;
     font-size:clamp(32px,4.4vw,54px);line-height:1.05;font-weight:700;
@@ -169,7 +171,11 @@
   .vchip b{font-weight:700;color:var(--ink)}
   .vchip .crit{color:var(--urgent);font-weight:700}
   .vchip .warn{color:var(--warn);font-weight:700}
-  .verdict .gen{margin-left:auto;font-family:var(--mono);font-size:9.5px;color:var(--faint);letter-spacing:.06em;text-transform:uppercase}
+  .verdict .gen{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.06em;text-transform:uppercase}
+  .runnote{font-family:var(--serif);font-size:13px;line-height:1.55;color:var(--faint);max-width:78ch;margin:-10px 0 24px 18px}
+  .runnote .lb{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;margin-right:8px}
+  .runnote .sc{font-family:var(--mono);font-size:11px;letter-spacing:.03em}
+  .vchip .dim{color:var(--faint);font-weight:400}
   .stale{background:color-mix(in srgb,var(--warn) 12%,var(--panel));border:1px solid color-mix(in srgb,var(--warn) 40%,var(--hair));
     color:var(--warn);padding:9px 14px;font-size:12.5px;margin-bottom:12px;font-weight:600}
 
@@ -204,7 +210,7 @@
   .row .l2{margin:4px 0 0 0;color:var(--muted);font-size:12.5px;line-height:1.55;
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   .row .meta{display:flex;align-items:baseline;gap:12px;flex:none}
-  .mtx{font-family:var(--mono);font-size:9.5px;color:var(--faint);white-space:nowrap;letter-spacing:.04em}
+  .mtx{font-family:var(--mono);font-size:11px;color:var(--faint);white-space:nowrap;letter-spacing:.04em}
   .impn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent-ink);min-width:22px;text-align:right}
   .noteic{color:var(--faint);font-size:12px;flex:none}
   .pill{display:inline-block;font-family:var(--mono);padding:2px 8px;font-size:11px;font-weight:700;
@@ -275,7 +281,7 @@
   .okcol{color:var(--ok);font-weight:600}
   .impactbig{display:flex;align-items:center;gap:14px;margin:2px 44px 16px 0}
   .impactbig .n{font-family:var(--mono);font-size:30px;font-weight:600;color:var(--accent-ink);line-height:1}
-  .impactbig .lb{font-family:var(--mono);font-size:8.5px;color:var(--faint);letter-spacing:.14em;text-transform:uppercase}
+  .impactbig .lb{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.14em;text-transform:uppercase}
   .impactbig .bar{flex:1;height:3px;background:var(--chrome);overflow:hidden}
   .impactbig .bar i{display:block;height:100%;background:var(--accent)}
   .actions{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 16px}
@@ -345,7 +351,12 @@
     #windows{grid-template-columns:1fr 1fr}
   }
   @media (max-width:760px){
-    .layout{grid-template-columns:minmax(0,1fr);grid-template-areas:"mast" "rail" "main"}
+    .layout{grid-template-columns:minmax(0,1fr);grid-template-areas:"mast" "main" "rail"}
+    .rail{border-top:1px solid var(--rule)}
+    .mobilestats{display:flex;flex-wrap:wrap;gap:6px;margin:-8px 0 18px}
+    .mobilestats .vchip{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
+    .mobilestats .crit{color:var(--urgent);font-weight:700} .mobilestats .warn{color:var(--warn);font-weight:700} .mobilestats .ok{color:var(--muted)}
+    .runnote{margin-left:0}
     .side{position:fixed;left:0;top:48px;bottom:0;width:232px;z-index:50;transform:translateX(-105%);
       transition:transform var(--t-2) var(--e-out);box-shadow:var(--sh-3);background:var(--bg);
       height:calc(100vh - 48px);grid-area:auto}
@@ -362,7 +373,9 @@
     main{padding:20px 14px 60px}
     .row .l1{flex-wrap:wrap}
     .row .meta{margin-left:auto}
-    .search input{min-width:80px}
+    .search{flex-basis:100px;min-width:100px}
+    .topbar{gap:8px}
+    .syncchip{max-width:104px;overflow:hidden;text-overflow:ellipsis;padding:0 6px}
   }
   .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
@@ -825,9 +838,14 @@ function renderVerdict(){
   // dismissing the last pursue item must not manufacture an all-clear.
   const act = DATA.filter(r=>r.rec==="GO"||r.rec==="HR").length;
   const qual = DATA.filter(r=>r.rec==="QUALIFY").length;
-  const wins = DATA.filter(r=>typeof r.days==="number"&&r.days>=0).sort((a,b)=>a.days-b.days);
+  // Urgency counts only live pursuits: screened-out (NO_GO) and WATCH windows are reported
+  // as a muted count, never as the "soonest" deadline.
+  const allWins = DATA.filter(r=>typeof r.days==="number"&&r.days>=0).sort((a,b)=>a.days-b.days);
+  const wins = allWins.filter(r=>r.rec!=="NO_GO"&&r.rec!=="WATCH");
+  const screened = allWins.length - wins.length;
   const dz = DATA.filter(r=>tGet(r).dismissed).length;
-  const gen = (META.updated||"").split("·")[0].trim();
+  const parts = (META.updated||"").split("·").map(x=>x.trim()).filter(Boolean);
+  const gen = parts[0]||"", runNotes = parts.slice(1);
   const soon = wins[0];
   const soonCls = soon ? (soon.days<=5?"crit":soon.days<=15?"warn":"") : "";
   document.getElementById("verdict").innerHTML = `
@@ -836,16 +854,18 @@ function renderVerdict(){
         ? `${act} item${act===1?"":"s"} need${act===1?"s":""} a decision`
         : qual ? `No decision-critical items · ${qual} qualify pursuit${qual===1?"":"s"} open`
                : `No live pursuits this scan`}</span>
-      <button class="vchip num" data-goto="windows"><b>${wins.length}</b> window${wins.length===1?"":"s"} open${
+      <button class="vchip num" data-goto="windows"><b>${wins.length}</b> live window${wins.length===1?"":"s"}${
+        screened?` <span class="dim">+${screened} screened out</span>`:""}${
         soon?` · <span class="${soonCls}">soonest ${esc(soon.close)} (${soon.days} bd)</span>`:""}</button>
       <button class="vchip num" data-goto="hypo"><b>${HYPOTHESES.length}</b> hypotheses</button>
       <button class="vchip num" data-goto="feed"><b>${DATA.length}</b> items${dz?` · ${dz} dismissed`:""}</button>
       <span class="gen num">generated ${esc(gen)}</span>
-    </div>`;
+    </div>${runNotes.length?`<p class="runnote"><span class="lb">This run</span>${runNotes.map(esc).join(' <span class="sc">·</span> ')}</p>`:""}`;
   const ms = document.getElementById("mobilestats");
   if(ms) ms.innerHTML = wins.slice(0,3).map(r=>{
     const c = r.days<=5?"crit":(r.days<=15?"warn":"ok");
-    return `<button class="vchip num" data-open="${DATA.indexOf(r)}"><span class="${c}">${r.days} bd</span> ${esc(r.title.slice(0,40))}…</button>`;
+    const t = r.title.length>40 ? r.title.slice(0,40).trimEnd()+"…" : r.title;
+    return `<button class="vchip num" data-open="${DATA.indexOf(r)}"><span class="${c}">${r.days} bd</span> ${esc(t)}</button>`;
   }).join("");
   // stale-data banner (bounded verdict support)
   const sb = document.getElementById("stalebox");
@@ -945,14 +965,16 @@ function renderNav(){
 }
 
 function renderRail(){
-  const wins = DATA.filter(r=>typeof r.days==="number"&&r.days>=0)
-                   .sort((a,b)=>a.days-b.days).slice(0,8);
-  document.getElementById("windows").innerHTML = wins.length ? wins.map(r=>{
+  const allWins = DATA.filter(r=>typeof r.days==="number"&&r.days>=0).sort((a,b)=>a.days-b.days);
+  const live = allWins.filter(r=>r.rec!=="NO_GO"&&r.rec!=="WATCH"), screened = allWins.length-live.length;
+  const wins = live.slice(0,8);
+  const screenedNote = screened ? `<div class="railnote">+${screened} screened-out window${screened===1?"":"s"} in the <button class="linkbtn" data-goto="windows">full list</button>.</div>` : "";
+  document.getElementById("windows").innerHTML = (wins.length ? wins.map(r=>{
     const c = r.days<=5?"var(--urgent)":(r.days<=15?"var(--warn)":"var(--ink)");
     return `<div class="wline" data-i="${DATA.indexOf(r)}" tabindex="0" role="button">
       <span class="d num"><b style="color:${c}">${r.days}</b><span>bd</span></span>
       <span class="t">${esc(r.title.slice(0,80))}</span></div>`;
-  }).join("") : `<div class="railnote">No open windows.</div>`;
+  }).join("") : `<div class="railnote">No live windows.</div>`) + screenedNote;
   const pursue = DATA.filter(r=>r.rec!=="NO_GO"&&r.rec!=="WATCH"&&!tGet(r).dismissed)
                      .sort((a,b)=>(b.fit||0)-(a.fit||0)).slice(0,6);
   document.getElementById("pursuelist").innerHTML = pursue.length ? pursue.map(r=>
@@ -1272,7 +1294,9 @@ document.getElementById("q").addEventListener("input", e=>{ state.q = e.target.v
 document.getElementById("palq") && document.getElementById("palq").addEventListener("input", ()=>{ palSel=0; renderPal(); });
 
 // ── First render: entrance with capped stagger (≤250ms cumulative; removed after) ──
-document.getElementById("updated").textContent = META.updated ? "Updated "+META.updated : "Awaiting first run";
+// Top bar shows the date + run label only (text before the first middot); the run notes
+// render as the "This run" line under the verdict. META.updated itself is unchanged.
+document.getElementById("updated").textContent = META.updated ? "Updated "+META.updated.split("·")[0].trim() : "Awaiting first run";
 // ── Inline-panel guard: feed rebuilds replace row nodes, so the panel is parked
 // on <body> during every renderFeed and re-mounted after. ──
 { const _rf = renderFeed;
