@@ -16,7 +16,7 @@
      DATA/HYPOTHESES/META blocks only — never rebuild this page. ── */
   :root{
     --bond:#FFFFFF; --ink:#111111; --ink2:#55554F; --hair:#D6D6D2; --red:#B3261E; --band:#F3F3F0;
-    --mono:"Courier New",Courier,"Nimbus Mono PS",monospace;
+    --mono:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; /* FONT-TOKEN: system sans, operator choice 2026-09-15 (was Courier New) */
     --e-out:cubic-bezier(.16,1,.3,1); --t:200ms;
   }
   @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
@@ -92,6 +92,7 @@
   .sheetcap p{margin:0}
   .sheetcap .l1{font-size:20px;font-weight:700;line-height:1.3}
   .sheetcap .l2{font-size:16px;line-height:1.4;margin-top:2px}
+  .sheetcap .l2 .sub{color:var(--ink2)}
   .sheetcap .runp{font-size:13px;line-height:1.6;max-width:96ch;margin-top:16px}
   .sheetcap .runnotes{font-size:13px;line-height:1.6;max-width:96ch;margin-top:8px;color:var(--ink2)}
   .sheetcap .sit{display:none;font-size:13px;color:var(--ink2);text-transform:uppercase;margin-bottom:6px}
@@ -105,6 +106,37 @@
   .viewsub:empty{display:none}
   .fn{font-size:12px;color:var(--ink2);margin:10px 0 0;max-width:96ch}
   .empty{padding:40px 0;color:var(--ink2);text-transform:uppercase;font-size:12px}
+
+  /* ── Map: where the matters sit. Bond states on hairlines; a state with matters takes the band
+     and an ink outline; the picked state inverts to ink. Labels are the two-letter codes, with the
+     nine small eastern states led out to a column. Red is the action-required count only. ── */
+  .usmap{display:block;width:100%;max-width:880px;height:auto;margin:0 0 8px}
+  .usmap .s{fill:var(--bond);stroke:var(--hair);stroke-width:.8;stroke-linejoin:round;transition:fill var(--t) var(--e-out)}
+  .usmap .st.has .s{fill:var(--band);stroke:var(--ink);cursor:pointer}
+  .usmap .st.has:hover .s{stroke-width:1.6}
+  .usmap .st.on .s{fill:var(--ink)}
+  .usmap .st:focus,.usmap .st:focus-visible{outline:none !important}   /* no platform ring on the map; keyboard focus shows as a heavier ink outline */
+  .usmap .st:focus-visible .s{stroke:var(--ink);stroke-width:2.4}
+  .usmap .lbl{font-family:inherit;font-size:15px;fill:var(--ink2);text-anchor:middle;pointer-events:none}
+  .usmap .lbl.col{text-anchor:start}
+  .usmap .st.has .lbl{fill:var(--ink);font-weight:700}
+  .usmap .st.on .lbl{fill:var(--bond)}
+  .usmap .cnt{font-weight:400}
+  .usmap .st.has .cnt.red{fill:var(--red)}
+  .usmap .st.on .cnt.red{fill:var(--bond)}
+  .usmap .lead{stroke:var(--hair);stroke-width:.8}
+  .usmap .st.has .lead{stroke:var(--ink)}
+  .stl{display:grid;grid-template-columns:4ch minmax(0,1fr) 9ch 6ch 12ch;column-gap:2ch;align-items:baseline;
+    padding:8px 0;border-top:1px solid var(--hair);line-height:1.5}
+  .stlines > .stl:last-child{border-bottom:1px solid var(--hair)}
+  .stl.head{color:var(--ink2);text-transform:uppercase;border-top:0;padding:0 0 6px}
+  .stl.head > span{font-size:12px;line-height:1.25}
+  .stl .c-n,.stl .c-l,.stl .c-usd{text-align:right;white-space:nowrap}
+  .stl .c-usd.none{color:var(--ink2)}
+  .stl.pick{cursor:pointer;transition:background var(--t) var(--e-out)}
+  .stl.pick:hover,.stl.on{background:var(--band)}
+  .stl.on .c-code{font-weight:700}
+  .stl .c-l.red{color:var(--red)}
 
   /* ── Lines: one hard column grid, every number in its column ── */
   .dl{display:grid;grid-template-columns:4ch minmax(0,1fr) 12ch 8ch 30ch 3ch;column-gap:2ch;align-items:baseline;
@@ -221,6 +253,7 @@
     .c-f::before,.c-bd::after,.c-no::before{color:var(--ink2)}
     .c-a{color:var(--ink2)}
     .dl.head,.cl.head{display:none}
+    .stl{grid-template-columns:4ch minmax(0,1fr) 8ch 5ch 11ch;column-gap:1ch}
     .einner{padding-left:0}
     .kv{grid-template-columns:1fr}
     .kv dd{margin-bottom:4px}
@@ -245,6 +278,10 @@
     .sheetcap{margin-bottom:48px}
     .sheetcap .sit{display:block}
     .sec{margin-bottom:56px}
+    .usmap .lbl{font-size:22px}
+    .stl{grid-template-columns:4ch 9ch 6ch minmax(0,1fr);grid-template-areas:"code n l usd"}
+    .stl.head > span{white-space:nowrap}
+    .stl .c-name{display:none} .stl .c-code{grid-area:code} .stl .c-n{grid-area:n} .stl .c-l{grid-area:l} .stl .c-usd{grid-area:usd}
     .gcap{flex-wrap:wrap;row-gap:4px}
     .eacts{gap:0 8px}
   }
@@ -268,7 +305,7 @@
     main{padding:0}
     body{font-size:10.5pt}
     .printhead{display:block;text-transform:uppercase;font-weight:700;border-bottom:1px solid #000;padding:0 0 6px;margin:0 0 18px}
-    .dl,.cl,.hyp{break-inside:avoid}
+    .dl,.cl,.hyp,.stl,.usmap{break-inside:avoid}
     .sec{margin-bottom:36pt}
     .c-bd.red::after{content:" (urgent)"}
     a{text-decoration:none}
@@ -301,6 +338,8 @@
     <div class="ix" id="clsnav"></div>
     <div class="cap">Tiers</div>
     <div class="ix" id="jurnav"></div>
+    <div class="cap">Places</div>
+    <div class="ix" id="stnav"></div>
     <div class="foot">
       Weekly <span data-vocab="noun">sitting</span> · federal + 7 states + district routes<br>
       <a href="rubric.html">Scoring rubric</a>
@@ -311,6 +350,13 @@
     <div class="printhead" id="printhead"></div>
     <div id="stalebox"></div>
     <div id="verdict"></div>
+
+    <section class="sec" id="mapsec" aria-labelledby="maptitle">
+      <div class="sechead"><h2 id="maptitle" data-vocab="where">Where the matters sit</h2><span class="n" id="mapcount"></span></div>
+      <svg class="usmap" id="usmap" viewBox="0 0 1040 610" role="group" aria-label="Map of the United States. States carrying matters are filled; press Enter on a state to filter the docket to it."></svg>
+      <div class="stlines" id="stlines"></div>
+      <p class="fn" id="mapfn"></p>
+    </section>
 
     <section class="sec" id="calsec" aria-labelledby="caltitle">
       <div class="sechead"><h2 id="caltitle">Calendar</h2><span class="n" id="calcount"></span></div>
@@ -354,6 +400,7 @@
       <li><b>Fit</b> is the 0–100 weighted rubric score. Red ink marks two things only: the ACTION REQUIRED count and stamp, and a business-day count of five or fewer. Everything else stays in plain ink.</li>
       <li><b>Net-to-Relay</b> flags money that never reaches Relay — ⚠ marks scholarship pass-throughs.</li>
       <li>Amounts, deadlines and eligibility are verified from primary sources on the <span data-vocab="noun">sitting</span> date; anything unverified is labeled.</li>
+      <li><b>Dollars stated</b> is the program pool or contract ceiling as the posting states it, summed over the matters that state one. A <span data-vocab="item">matter</span> with no stated amount is counted, never estimated. The map places every <span data-vocab="item">matter</span> in its state; federal competitions sit on the nationwide line. Click a state, or a line in the table under the map, to show only that place's <span data-vocab="items">matters</span>.</li>
     </ul>
 
     <h3>Coverage &amp; pipeline</h3>
@@ -410,7 +457,9 @@
 // Row schema: {rec:GO|HR|QUALIFY|WATCH|NO_GO, fit:0-100|null, elig, eligWarn, inst, net, netWarn,
 //   close:"...", days:int|null (business days), effort, path:"next step", title, url, source,
 //   summary, tier:"federal"|"state"|"district" (federal inferred from source when absent),
-//   status:"NEW"|"UPDATED" (optional, per-run)}
+//   status:"NEW"|"UPDATED" (optional, per-run),
+//   st:"TN"|"US" (two-letter state; "US" for federal/nationwide), amt:USD number|null (the program pool
+//   or contract ceiling as stated in the sitting summary), amtNote:"basis of amt, or why it is unknown"}
 const GG="https://www.grants.gov/search-results-detail/";
 const FR="https://www.federalregister.gov/documents/";
 const DATA=[
@@ -421,53 +470,53 @@ const DATA=[
  // Noyce (8/25), IL 21st CCLC (8/24), IN DDB SLP + Medical (8/26), IN ILEARN growth analysis (8/26),
  // IN daycare RFI (8/27), DeKalb community engagement (8/27), NY MBK Indigenous (8/28).
  // ── New this run 2026-08-12: the first GO the scan has produced. TDOE statewide tutoring-training contract, verified from the full RFP PDF. ──
- {rec:"GO",fit:73,elig:"High",eligWarn:false,inst:"contract",net:"institutional · fee-for-service",netWarn:false,close:"Sep 29, 2026",days:11,effort:"Medium",path:"respond as prime · State answers Qs 9/21",title:"TN — Tutoring District Support Convenings (RFP 33101-25102FAS2)",url:"https://www.tn.gov/content/dam/tn/generalservices/documents/cpo/solicitations/33101-25102fas2/RFP_Tutoring%20_District_Support_Convenings_FINAL.pdf",source:"TN CPO",tier:"state",summary:"TDOE seeks one contractor to train LEA leaders and tutors statewide on tutoring best practices under TN ALL Corps: a 1-day statewide training (300 attendees), 3 regional convenings, 2 virtual convenings, and 12–24 classroom training videos. $2M maximum liability over an 8-month term, no match, all institutional fee-for-service. Vendor path clears (high-dosage tutoring / tutor-corps training + PD); no applicant-type restriction in the mandatory requirements and the pro forma contract names Non-Profit Corporation. Held at Tier B by an unidentified incumbent (TN ALL Corps has run since 2021), no verified TDOE relationship, and video/event-logistics scope likely needing a subcontractor. Notice of Intent due 8/18 2:00 CT (4 bd, not a prerequisite but required to receive amendments); questions close 8/25; pre-response conference 8/17 is NOT mandatory. Full 33-page RFP read 2026-08-12; CPO listing re-checked 2026-09-14: window 08/11→09/29 unchanged, no amendments posted (Solicitation Notice only). NOI deadline (8/18) and the question window (closed 8/25) have both PASSED — NOI was not a prerequisite to respond, but non-filers don't receive amendments/Q&A directly; this scan monitors the listing daily. The State answers questions 9/21 — six business days before the 9/29 deadline, so plan the response as if the answers land too late to reshape it. Footer typo: the PDF page footer reads FAS3; cover page, CPO listing, and folder all read FAS2 — use FAS2."},
- {rec:"QUALIFY",fit:52,elig:"Med",eligWarn:false,inst:"grant",net:"verify",netWarn:false,close:"see NOFO",days:null,effort:"High",path:"ask eligibility",title:"FIPSE — Postsecondary Student Success (84.116)",url:FR+"2026/06/03/2026-11110/notice-announcing-fund-for-the-improvement-of-postsecondary-education-postsecondary-student-success",source:"Fed. Register",summary:"ED innovation fund for postsecondary student success; confirm whether graduate educator-prep is in scope."},
- {rec:"WATCH",fit:40,elig:"—",eligWarn:false,inst:"coop agr",net:"partner-only",netWarn:false,close:"Oct 14, 2026",days:22,effort:"—",path:"find eng-research prime",title:"NSF Research Experiences for Teachers, Eng/CS (47.070)",url:GG+"350802",source:"grants.gov",summary:"Research experiences for K-12 STEM teachers; requires an engineering/CS research host Relay lacks."},
- {rec:"WATCH",fit:30,elig:"—",eligWarn:false,inst:"grant",net:"—",netWarn:false,close:"see NOFO",days:null,effort:"—",path:"monitor",title:"School Safety Enhancement (84.184)",url:FR+"2026/06/03/2026-11103/notice-announcing-school-safety-enhancement-program-competition",source:"Fed. Register",summary:"ED school-safety infrastructure; outside Relay's educator-prep core."},
- {rec:"WATCH",fit:null,elig:"—",eligWarn:false,inst:"—",net:"—",netWarn:false,close:"see notice",days:null,effort:"—",path:"identify program",title:"Reopening/Extension of Deadlines (program unnamed)",url:FR+"2026/06/26/2026-12972/reopening-or-extension-of-application-deadline-dates-applications-for-new-awards",source:"Fed. Register",summary:"FR notice doesn't name the program in machine-readable form — open it to identify which competition. Prefilter-audit item."},
- {rec:"NO_GO",fit:15,elig:"—",eligWarn:false,inst:"grant",net:"—",netWarn:false,close:"see NOFO",days:null,effort:"—",path:"not educator prep (Title VI)",title:"Centers Aligned With Areas of National Need (84.015)",url:FR+"2026/06/12/2026-11893/notice-announcing-centers-aligned-with-areas-of-national-need-program-competition",source:"Fed. Register",summary:"Corrected via ALN lookup: Title VI foreign-language/area-studies National Resource Centers — not educator preparation."},
+ {rec:"GO",fit:73,elig:"High",eligWarn:false,inst:"contract",net:"institutional · fee-for-service",netWarn:false,close:"Sep 29, 2026",days:11,effort:"Medium",path:"respond as prime · State answers Qs 9/21",title:"TN — Tutoring District Support Convenings (RFP 33101-25102FAS2)",url:"https://www.tn.gov/content/dam/tn/generalservices/documents/cpo/solicitations/33101-25102fas2/RFP_Tutoring%20_District_Support_Convenings_FINAL.pdf",source:"TN CPO",tier:"state",summary:"TDOE seeks one contractor to train LEA leaders and tutors statewide on tutoring best practices under TN ALL Corps: a 1-day statewide training (300 attendees), 3 regional convenings, 2 virtual convenings, and 12–24 classroom training videos. $2M maximum liability over an 8-month term, no match, all institutional fee-for-service. Vendor path clears (high-dosage tutoring / tutor-corps training + PD); no applicant-type restriction in the mandatory requirements and the pro forma contract names Non-Profit Corporation. Held at Tier B by an unidentified incumbent (TN ALL Corps has run since 2021), no verified TDOE relationship, and video/event-logistics scope likely needing a subcontractor. Notice of Intent due 8/18 2:00 CT (4 bd, not a prerequisite but required to receive amendments); questions close 8/25; pre-response conference 8/17 is NOT mandatory. Full 33-page RFP read 2026-08-12; CPO listing re-checked 2026-09-14: window 08/11→09/29 unchanged, no amendments posted (Solicitation Notice only). NOI deadline (8/18) and the question window (closed 8/25) have both PASSED — NOI was not a prerequisite to respond, but non-filers don't receive amendments/Q&A directly; this scan monitors the listing daily. The State answers questions 9/21 — six business days before the 9/29 deadline, so plan the response as if the answers land too late to reshape it. Footer typo: the PDF page footer reads FAS3; cover page, CPO listing, and folder all read FAS2 — use FAS2.", st:"TN", amt:2000000, amtNote:"$2M maximum liability, 8-month term"},
+ {rec:"QUALIFY",fit:52,elig:"Med",eligWarn:false,inst:"grant",net:"verify",netWarn:false,close:"see NOFO",days:null,effort:"High",path:"ask eligibility",title:"FIPSE — Postsecondary Student Success (84.116)",url:FR+"2026/06/03/2026-11110/notice-announcing-fund-for-the-improvement-of-postsecondary-education-postsecondary-student-success",source:"Fed. Register",summary:"ED innovation fund for postsecondary student success; confirm whether graduate educator-prep is in scope.", st:"US", amt:null, amtNote:"amount not stated in the NOFO summary"},
+ {rec:"WATCH",fit:40,elig:"—",eligWarn:false,inst:"coop agr",net:"partner-only",netWarn:false,close:"Oct 14, 2026",days:22,effort:"—",path:"find eng-research prime",title:"NSF Research Experiences for Teachers, Eng/CS (47.070)",url:GG+"350802",source:"grants.gov",summary:"Research experiences for K-12 STEM teachers; requires an engineering/CS research host Relay lacks.", st:"US", amt:null, amtNote:"amount not stated"},
+ {rec:"WATCH",fit:30,elig:"—",eligWarn:false,inst:"grant",net:"—",netWarn:false,close:"see NOFO",days:null,effort:"—",path:"monitor",title:"School Safety Enhancement (84.184)",url:FR+"2026/06/03/2026-11103/notice-announcing-school-safety-enhancement-program-competition",source:"Fed. Register",summary:"ED school-safety infrastructure; outside Relay's educator-prep core.", st:"US", amt:null, amtNote:"amount not stated"},
+ {rec:"WATCH",fit:null,elig:"—",eligWarn:false,inst:"—",net:"—",netWarn:false,close:"see notice",days:null,effort:"—",path:"identify program",title:"Reopening/Extension of Deadlines (program unnamed)",url:FR+"2026/06/26/2026-12972/reopening-or-extension-of-application-deadline-dates-applications-for-new-awards",source:"Fed. Register",summary:"FR notice doesn't name the program in machine-readable form — open it to identify which competition. Prefilter-audit item.", st:"US", amt:null, amtNote:"program unnamed; amount unknown"},
+ {rec:"NO_GO",fit:15,elig:"—",eligWarn:false,inst:"grant",net:"—",netWarn:false,close:"see NOFO",days:null,effort:"—",path:"not educator prep (Title VI)",title:"Centers Aligned With Areas of National Need (84.015)",url:FR+"2026/06/12/2026-11893/notice-announcing-centers-aligned-with-areas-of-national-need-program-competition",source:"Fed. Register",summary:"Corrected via ALN lookup: Title VI foreign-language/area-studies National Resource Centers — not educator preparation.", st:"US", amt:null, amtNote:"amount not stated"},
  // ── Out-of-band IL finds 2026-08-04 (manual ISBE check — wired fundingops page is operationally broken; see digest Uncertainties. CSFA supplementary source recommended, not yet wired). 21st CCLC row aged off 2026-08-31 (closed 8/24). ──
  // ── District (Phase C) — from 2026-07-08; listing reconfirmed live on every run since (records unchanged 2026-08-04). ──
- {rec:"QUALIFY",fit:69,elig:"Med",eligWarn:false,inst:"contract",net:"institutional · fee-for-service (TBD)",netWarn:false,close:"Sep 30, 2026",days:12,effort:"Medium",path:"register Ionwave · pull RFP",title:"Houston ISD — Leadership, Teacher, and Staff Development (RFP 26-04-47)",url:"https://houstonisd.ionwave.net/SourcingEvents.aspx?SourceType=1",source:"Ionwave",tier:"district",summary:"HISD annual vendor-pool RFP for teacher/leadership/staff PD — dead-center Relay vendor line (Teacher Professional Education + NPAF). Deep target, full high-need carve-out. QUALIFY: RFP packet value/pre-bid/insurance not machine-readable — register + pull packet. Closes 9/30/2026 10:00 CT."},
- {rec:"QUALIFY",fit:60,elig:"Med",eligWarn:false,inst:"contract",net:"institutional · fee-for-service (TBD)",netWarn:false,close:"Sep 30, 2026",days:12,effort:"Medium",path:"register Ionwave · pull RFP",title:"Houston ISD — Student Services, Enrichment, Tutorials, and Mentoring (RFP 26-04-36)",url:"https://houstonisd.ionwave.net/SourcingEvents.aspx?SourceType=1",source:"Ionwave",tier:"district",summary:"Companion HISD vendor-pool RFP; tutorials + mentoring map to Relay's high-dosage tutoring/mentoring lines (secondary to PD). Deep target, carve-out. QUALIFY: packet unverified; tutoring is a non-core Relay line. Closes 9/30/2026 10:00 CT."},
+ {rec:"QUALIFY",fit:69,elig:"Med",eligWarn:false,inst:"contract",net:"institutional · fee-for-service (TBD)",netWarn:false,close:"Sep 30, 2026",days:12,effort:"Medium",path:"register Ionwave · pull RFP",title:"Houston ISD — Leadership, Teacher, and Staff Development (RFP 26-04-47)",url:"https://houstonisd.ionwave.net/SourcingEvents.aspx?SourceType=1",source:"Ionwave",tier:"district",summary:"HISD annual vendor-pool RFP for teacher/leadership/staff PD — dead-center Relay vendor line (Teacher Professional Education + NPAF). Deep target, full high-need carve-out. QUALIFY: RFP packet value/pre-bid/insurance not machine-readable — register + pull packet. Closes 9/30/2026 10:00 CT.", st:"TX", amt:null, amtNote:"vendor-pool RFP; packet value not machine-readable"},
+ {rec:"QUALIFY",fit:60,elig:"Med",eligWarn:false,inst:"contract",net:"institutional · fee-for-service (TBD)",netWarn:false,close:"Sep 30, 2026",days:12,effort:"Medium",path:"register Ionwave · pull RFP",title:"Houston ISD — Student Services, Enrichment, Tutorials, and Mentoring (RFP 26-04-36)",url:"https://houstonisd.ionwave.net/SourcingEvents.aspx?SourceType=1",source:"Ionwave",tier:"district",summary:"Companion HISD vendor-pool RFP; tutorials + mentoring map to Relay's high-dosage tutoring/mentoring lines (secondary to PD). Deep target, carve-out. QUALIFY: packet unverified; tutoring is a non-core Relay line. Closes 9/30/2026 10:00 CT.", st:"TX", amt:null, amtNote:"vendor-pool RFP; packet value not machine-readable"},
  // ── Standing from 2026-07-14 (CT Sheff hypothesis remains open, rolling). ──
- {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"formula subgrant",net:"vendor $ downstream (hypothesis)",netWarn:false,close:"rolling FY27–29",days:null,effort:"—",path:"cultivate Hartford/CREC",title:"CT — Sheff Region Interdistrict Magnet Reformulation Grant (RFP 867)",url:"https://portal.ct.gov/-/media/sde/rfp/rfp867_sheff_region_magnet_reformulation_grant_fy27-29.docx?rev=20a37d1a7a9148d7bb0d0675fae0078d&hash=70922E6FEC1DC7C157BC455967F579FA",source:"CT CSDE",tier:"state",summary:"Operator-only (Hartford/E. Hartford/Bloomfield BOEs, CREC, Goodwin) — Relay cannot apply. Converted to a Stream 2 partnership hypothesis: operators pick their own vendors, teacher recruitment is a required progress metric, Hartford PS is a target. Cultivate by 2026-12-31. Full RFP read 2026-07-14."},
+ {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"formula subgrant",net:"vendor $ downstream (hypothesis)",netWarn:false,close:"rolling FY27–29",days:null,effort:"—",path:"cultivate Hartford/CREC",title:"CT — Sheff Region Interdistrict Magnet Reformulation Grant (RFP 867)",url:"https://portal.ct.gov/-/media/sde/rfp/rfp867_sheff_region_magnet_reformulation_grant_fy27-29.docx?rev=20a37d1a7a9148d7bb0d0675fae0078d&hash=70922E6FEC1DC7C157BC455967F579FA",source:"CT CSDE",tier:"state",summary:"Operator-only (Hartford/E. Hartford/Bloomfield BOEs, CREC, Goodwin) — Relay cannot apply. Converted to a Stream 2 partnership hypothesis: operators pick their own vendors, teacher recruitment is a required progress metric, Hartford PS is a target. Cultivate by 2026-12-31. Full RFP read 2026-07-14.", st:"CT", amt:null, amtNote:"operator-only grant; amount not stated"},
  // ── Aged off 2026-08-17: NYSED SIG (district deadline 8/15) and the TN pregnancy-app RFP (8/14). The SIG vendor-cultivation hypothesis stays live — see the Hypotheses view. ──
  // TN SWC 387 Contingent Workforce MSP (RFP 32110-38726) aged off 2026-09-04 (closed 9/1).
  // ── New this run 2026-07-30 (all screened out; none converted to hypotheses — FCEP considered and rejected, see digest). ──
- {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"coop agreement (forecast)",net:"—",netWarn:false,close:"forecast",days:null,effort:"—",path:"mission: medical GME",title:"HRSA — Teaching Health Center Graduate Medical Education (93.530, HRSA-27-084)",url:GG+"363324",source:"grants.gov",summary:"Community-based primary-care MEDICAL residency training — 'teacher residency' keyword false positive. Re-posted FY27 forecast of a program first screened out 2026-07-08; past winners are medical GME centers."},
- {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"formula subgrant",net:"—",netWarn:false,close:"Sep 15, 2026",days:1,effort:"—",path:"LEA/BOCES-only · no Relay line",title:"NY — NYSED RFP #199 MBK Family & Community Engagement Program 2026-30",url:"https://www.nysed.gov/funding-opportunities/rfp-199-mbk-family-and-community-engagement-program-fcep-2026-2030",source:"NYSED",tier:"state",summary:"District/BOCES-only ($9.3M/yr; $3.1M NYC), 25% district match, 4-yr term. IHE is an allowed PARTNER category but the funded work is family/community engagement — not a Relay service line — so not converted to a hypothesis. Verified from RFP page 2026-07-30."},
+ {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"coop agreement (forecast)",net:"—",netWarn:false,close:"forecast",days:null,effort:"—",path:"mission: medical GME",title:"HRSA — Teaching Health Center Graduate Medical Education (93.530, HRSA-27-084)",url:GG+"363324",source:"grants.gov",summary:"Community-based primary-care MEDICAL residency training — 'teacher residency' keyword false positive. Re-posted FY27 forecast of a program first screened out 2026-07-08; past winners are medical GME centers.", st:"US", amt:null, amtNote:"forecast; amount not stated"},
+ {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"formula subgrant",net:"—",netWarn:false,close:"Sep 15, 2026",days:1,effort:"—",path:"LEA/BOCES-only · no Relay line",title:"NY — NYSED RFP #199 MBK Family & Community Engagement Program 2026-30",url:"https://www.nysed.gov/funding-opportunities/rfp-199-mbk-family-and-community-engagement-program-fcep-2026-2030",source:"NYSED",tier:"state",summary:"District/BOCES-only ($9.3M/yr; $3.1M NYC), 25% district match, 4-yr term. IHE is an allowed PARTNER category but the funded work is family/community engagement — not a Relay service line — so not converted to a hypothesis. Verified from RFP page 2026-07-30.", st:"NY", amt:9300000, amtNote:"$9.3M per year statewide ($3.1M NYC), 4-year term"},
  // NY MBK Fellows aged off 2026-09-04 (closed 8/31).
  // IN SEA General Supervision Corrective Action RFQ aged off 2026-09-04 (closed 9/2).
  // ── New this run 2026-08-11 (12 screened; CT HDT converted to a vendor hypothesis — see HYPOTHESES; TX ESBD cloud-implementation + workforce-forum records and the FR umbrella notice 2026-16259 are digest-only: closed/awarded/duplicate). ──
- {rec:"NO_GO",fit:18,elig:"—",eligWarn:false,inst:"grant",net:"—",netWarn:false,close:"Oct 1, 2026",days:13,effort:"—",path:"mission: research training",title:"IES NCSER — Research Training Programs in Special Education (84.324B)",url:GG+"363467",source:"grants.gov",summary:"Early-career development + methods training for SpEd RESEARCHERS. Research-institution program — past 84.324 winners are Oregon, Vanderbilt, UNC, ORI, RAND — not educator prep. Eligibility + 10/1/2026 deadline verified via fetchOpportunity 2026-08-11; FR umbrella notice 2026-16259."},
- {rec:"NO_GO",fit:15,elig:"—",eligWarn:false,inst:"grant",net:"—",netWarn:false,close:"Oct 1, 2026",days:13,effort:"—",path:"state-agency SLDS research",title:"IES NCSER — Longitudinal Data for State SpEd Policymaking (84.324S)",url:GG+"363471",source:"grants.gov",summary:"Funds STATE AGENCIES' use of statewide longitudinal data systems for SpEd policy decisions; applications must include the state agency; $1.2M ceiling. Not a Relay line. Verified 2026-08-11."},
- {rec:"NO_GO",fit:15,elig:"—",eligWarn:false,inst:"grant",net:"—",netWarn:false,close:"Oct 1, 2026",days:13,effort:"—",path:"state-agency SLDS research",title:"IES NCER — Longitudinal Data for State Policymaking (84.305S)",url:GG+"363469",source:"grants.gov",summary:"Companion NCER SLDS competition ('grow your own teacher' keyword false positive). The FR umbrella notice 2026-16259 also covers the 84.305B/D research-training programs — same screen, one entry."},
- {rec:"NO_GO",fit:22,elig:"No",eligWarn:true,inst:"grant",net:"—",netWarn:false,close:"Sep 18, 2026",days:4,effort:"—",path:"charter ed corps only · customer-base signal",title:"NY — NYSED RFP #458 Charter Schools Program (CSP) Expansion Grants",url:"https://www.nysed.gov/funding-opportunities/rfp-458-charter-schools-programs-csp-expansion-grants",source:"NYSED",tier:"state",summary:"$14M federal CSP via NYSED for EXISTING charter education corporations expanding seats/grades (Regents / Buffalo BOE / NYC DOE / SUNY authorizers). Relay cannot apply — but awardees are Relay's NY customer base and expansion budgets can carry staff development. RFP updated 8/7 with increased award amounts; NOI due 9/4. Verified from RFP page 2026-08-11."},
- {rec:"NO_GO",fit:20,elig:"No",eligWarn:true,inst:"grant",net:"—",netWarn:false,close:"Sep 18, 2026",days:4,effort:"—",path:"charter ed corps only",title:"NY — NYSED RFP #457 Charter Schools Program (CSP) Start-Up Grants",url:"https://www.nysed.gov/funding-opportunities/rfp-457-charter-schools-programs-csp-start-grants",source:"NYSED",tier:"state",summary:"$12M CSP start-up companion for NEW charters authorized by Regents or SUNY; education corporation applies for the school. Same eligibility screen as #458. Verified from RFP page 2026-08-11."},
+ {rec:"NO_GO",fit:18,elig:"—",eligWarn:false,inst:"grant",net:"—",netWarn:false,close:"Oct 1, 2026",days:13,effort:"—",path:"mission: research training",title:"IES NCSER — Research Training Programs in Special Education (84.324B)",url:GG+"363467",source:"grants.gov",summary:"Early-career development + methods training for SpEd RESEARCHERS. Research-institution program — past 84.324 winners are Oregon, Vanderbilt, UNC, ORI, RAND — not educator prep. Eligibility + 10/1/2026 deadline verified via fetchOpportunity 2026-08-11; FR umbrella notice 2026-16259.", st:"US", amt:null, amtNote:"amount not stated"},
+ {rec:"NO_GO",fit:15,elig:"—",eligWarn:false,inst:"grant",net:"—",netWarn:false,close:"Oct 1, 2026",days:13,effort:"—",path:"state-agency SLDS research",title:"IES NCSER — Longitudinal Data for State SpEd Policymaking (84.324S)",url:GG+"363471",source:"grants.gov",summary:"Funds STATE AGENCIES' use of statewide longitudinal data systems for SpEd policy decisions; applications must include the state agency; $1.2M ceiling. Not a Relay line. Verified 2026-08-11.", st:"US", amt:1200000, amtNote:"$1.2M ceiling per award"},
+ {rec:"NO_GO",fit:15,elig:"—",eligWarn:false,inst:"grant",net:"—",netWarn:false,close:"Oct 1, 2026",days:13,effort:"—",path:"state-agency SLDS research",title:"IES NCER — Longitudinal Data for State Policymaking (84.305S)",url:GG+"363469",source:"grants.gov",summary:"Companion NCER SLDS competition ('grow your own teacher' keyword false positive). The FR umbrella notice 2026-16259 also covers the 84.305B/D research-training programs — same screen, one entry.", st:"US", amt:null, amtNote:"amount not stated"},
+ {rec:"NO_GO",fit:22,elig:"No",eligWarn:true,inst:"grant",net:"—",netWarn:false,close:"Sep 18, 2026",days:4,effort:"—",path:"charter ed corps only · customer-base signal",title:"NY — NYSED RFP #458 Charter Schools Program (CSP) Expansion Grants",url:"https://www.nysed.gov/funding-opportunities/rfp-458-charter-schools-programs-csp-expansion-grants",source:"NYSED",tier:"state",summary:"$14M federal CSP via NYSED for EXISTING charter education corporations expanding seats/grades (Regents / Buffalo BOE / NYC DOE / SUNY authorizers). Relay cannot apply — but awardees are Relay's NY customer base and expansion budgets can carry staff development. RFP updated 8/7 with increased award amounts; NOI due 9/4. Verified from RFP page 2026-08-11.", st:"NY", amt:14000000, amtNote:"$14M federal CSP pool via NYSED"},
+ {rec:"NO_GO",fit:20,elig:"No",eligWarn:true,inst:"grant",net:"—",netWarn:false,close:"Sep 18, 2026",days:4,effort:"—",path:"charter ed corps only",title:"NY — NYSED RFP #457 Charter Schools Program (CSP) Start-Up Grants",url:"https://www.nysed.gov/funding-opportunities/rfp-457-charter-schools-programs-csp-start-grants",source:"NYSED",tier:"state",summary:"$12M CSP start-up companion for NEW charters authorized by Regents or SUNY; education corporation applies for the school. Same eligibility screen as #458. Verified from RFP page 2026-08-11.", st:"NY", amt:12000000, amtNote:"$12M CSP start-up pool"},
  // CT HDT LEA grant RFP 868 aged off 2026-09-14 (LEA applications closed 9/11); the CSDE tutor-vendor-list hypothesis stays live — see Hypotheses.
- {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"grant",net:"—",netWarn:false,close:"Sep 25, 2026",days:9,effort:"—",path:"district-side wraparound services",title:"CT — Open Choice Grant-in-Aid, Wraparound Services (RFP 860)",url:"https://portal.ct.gov/-/media/sde/rfp/rfp860_openchoicegrant-in-aid_wraparoundservices_2026-27.docx?rev=395c57843a5a4a6a8007f5875e42a935&hash=A2CB633F0F8DFE7727C1BEE8DBEBB7EB",source:"CT CSDE",tier:"state",summary:"Up to $2M (C.G.S. 10-266aa(k)(3)) for wraparound services — tutoring, family engagement, college/career prep — for Open Choice students, SY 2026-27; districts apply by 9/25. District-side direct student services, not Relay's educator-prep/PD line. DOCX read 2026-08-11."},
- {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Sep 15, 2026",days:1,effort:"—",path:"mission: ammunition",title:"IN — ILEA Force-on-Force Ammunition, 9mm (001030000088097)",url:"https://www.in.gov/idoa/proc/solicitations/files/001030000088097.zip",source:"IN IDOA",tier:"state",summary:"Deadline moved 9/7 → 9/15/2026 (12:00 PM EST) this run; screen unchanged. 32,000 rounds of training ammunition for the Indiana Law Enforcement Academy — 'training' keyword false positive."},
+ {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"grant",net:"—",netWarn:false,close:"Sep 25, 2026",days:9,effort:"—",path:"district-side wraparound services",title:"CT — Open Choice Grant-in-Aid, Wraparound Services (RFP 860)",url:"https://portal.ct.gov/-/media/sde/rfp/rfp860_openchoicegrant-in-aid_wraparoundservices_2026-27.docx?rev=395c57843a5a4a6a8007f5875e42a935&hash=A2CB633F0F8DFE7727C1BEE8DBEBB7EB",source:"CT CSDE",tier:"state",summary:"Up to $2M (C.G.S. 10-266aa(k)(3)) for wraparound services — tutoring, family engagement, college/career prep — for Open Choice students, SY 2026-27; districts apply by 9/25. District-side direct student services, not Relay's educator-prep/PD line. DOCX read 2026-08-11.", st:"CT", amt:2000000, amtNote:"up to $2M, SY 2026-27"},
+ {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Sep 15, 2026",days:1,effort:"—",path:"mission: ammunition",title:"IN — ILEA Force-on-Force Ammunition, 9mm (001030000088097)",url:"https://www.in.gov/idoa/proc/solicitations/files/001030000088097.zip",source:"IN IDOA",tier:"state",summary:"Deadline moved 9/7 → 9/15/2026 (12:00 PM EST) this run; screen unchanged. 32,000 rounds of training ammunition for the Indiana Law Enforcement Academy — 'training' keyword false positive.", st:"IN", amt:null, amtNote:"amount not stated"},
  // ── 2026-08-13 off-anchor DeKalb community-engagement RFP 27-810 aged off 2026-08-31 (closed 8/27). ──
  // ── New this run 2026-08-17 (Monday full run): 2 NEW candidates, both screened out on the mission boundary. ──
- {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Sep 22, 2026",days:6,effort:"—",path:"mission: building construction",title:"TX TPWD — New Conservation Education Building, Powderhorn WMA (ESBD 1210264)",url:"https://www.txsmartbuy.gov/esbd/1210264",source:"TX ESBD",tier:"state",summary:"Commercial building construction at a wildlife management area in Calhoun County. NIGP class/item codes 90924 (Building Construction, Commercial and Institutional) and 90927 (Building Construction, Educational) — the word \u2018Education\u2019 is in the building's name, not the work. Facilities and construction are an explicit vendor-path exclusion. Due 9/22 2:00 PM; posted 8/14. ESBD posting read 2026-08-17."},
- {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Nov 6, 2026",days:39,effort:"—",path:"mission: insurance carrier",title:"TN F&A — Voluntary, Fully-Insured Vision Insurance Plan (RFP 31786-00192)",url:"https://www.tn.gov/content/dam/tn/generalservices/documents/cpo/rfp-updates/31786-00192/RFP%2031786-00192%20Vision.docx",source:"TN CPO",tier:"state",summary:"Group vision-insurance carrier procurement for state, local-education, and local-government employees and retirees: national provider network, HIPAA business-associate agreement, 834 enrollment feeds, Quest Analytics network-access reporting. \u2018Local Education Insurance Committee\u2019 among the issuing bodies is the only education signal. Benefits begin 1/1/2028, term through 12/31/2032; responses due 11/6 2:00 PM. Full RFP DOCX read 2026-08-17."},
+ {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Sep 22, 2026",days:6,effort:"—",path:"mission: building construction",title:"TX TPWD — New Conservation Education Building, Powderhorn WMA (ESBD 1210264)",url:"https://www.txsmartbuy.gov/esbd/1210264",source:"TX ESBD",tier:"state",summary:"Commercial building construction at a wildlife management area in Calhoun County. NIGP class/item codes 90924 (Building Construction, Commercial and Institutional) and 90927 (Building Construction, Educational) — the word \u2018Education\u2019 is in the building's name, not the work. Facilities and construction are an explicit vendor-path exclusion. Due 9/22 2:00 PM; posted 8/14. ESBD posting read 2026-08-17.", st:"TX", amt:null, amtNote:"amount not stated"},
+ {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Nov 6, 2026",days:39,effort:"—",path:"mission: insurance carrier",title:"TN F&A — Voluntary, Fully-Insured Vision Insurance Plan (RFP 31786-00192)",url:"https://www.tn.gov/content/dam/tn/generalservices/documents/cpo/rfp-updates/31786-00192/RFP%2031786-00192%20Vision.docx",source:"TN CPO",tier:"state",summary:"Group vision-insurance carrier procurement for state, local-education, and local-government employees and retirees: national provider network, HIPAA business-associate agreement, 834 enrollment feeds, Quest Analytics network-access reporting. \u2018Local Education Insurance Committee\u2019 among the issuing bodies is the only education signal. Benefits begin 1/1/2028, term through 12/31/2032; responses due 11/6 2:00 PM. Full RFP DOCX read 2026-08-17.", st:"TN", amt:null, amtNote:"insurance carrier procurement; no stated value"},
  // ── New this run 2026-08-21: 2 candidates, both screened out on the mission boundary (1 NEW carrier RFP; 1 deadline-extension re-entry). ──
- {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Nov 13, 2026",days:44,effort:"—",path:"mission: insurance carrier",title:"TN F&A — Life and Accidental Death & Dismemberment Insurance (RFP 31786-00193)",url:"https://www.tn.gov/content/dam/tn/generalservices/documents/cpo/rfp-updates/31786-00193/RFP_31786-00193_Life_and_ADandD_RFP.docx",source:"TN CPO",tier:"state",summary:"Group life/AD&D insurance-carrier procurement — the sibling of the vision-insurance RFP 31786-00192 screened out 2026-08-17 (same 31786 benefits-administration vehicle family, 24 appendices). Posted 8/20; responses due 11/13/2026 per the CPO listing row read 2026-08-21. Stage-A screen — gate decisive from title and instrument, RFP DOCX not deep-read."},
- {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Oct 20, 2026",days:26,effort:"—",path:"mission: food service",status:"UPDATED",title:"TN — Dining Services, Public Safety Training Academy (RFP 32101-01232026-SR1, Amd 3)",url:"https://www.tn.gov/content/dam/tn/generalservices/documents/cpo/rfp-updates/32101-01232026-sr1/RFP_32101-01232026-SR1.pdf",source:"TN CPO",tier:"state",summary:"Food-service contract for the state Public Safety Training Academy — first screened out 2026-07-07, re-affirmed at Amendment 1 (07-24), then aged off when it closed 8/05. Amendment 2 (listing marked UPDATED 08/20) extends the response deadline to 10/20/2026 per the CPO listing read 2026-08-21, so it re-enters the audit trail. Amendment 3 (dated 9/11, listing marked UPDATED 09/11/2026, read 2026-09-14) only revises the schedule of events: State answers to first-round questions 9/11, a second written question round (five max) due 9/18 2:00 CT, State answers 10/12, response deadline 10/20 2:00 CT unchanged, intent to award 11/18. The amendment header reads RFP 32101-02132026-SR1 (transposed digits); the listing and folder read 01232026. Mission-boundary screen unchanged."},
+ {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Nov 13, 2026",days:44,effort:"—",path:"mission: insurance carrier",title:"TN F&A — Life and Accidental Death & Dismemberment Insurance (RFP 31786-00193)",url:"https://www.tn.gov/content/dam/tn/generalservices/documents/cpo/rfp-updates/31786-00193/RFP_31786-00193_Life_and_ADandD_RFP.docx",source:"TN CPO",tier:"state",summary:"Group life/AD&D insurance-carrier procurement — the sibling of the vision-insurance RFP 31786-00192 screened out 2026-08-17 (same 31786 benefits-administration vehicle family, 24 appendices). Posted 8/20; responses due 11/13/2026 per the CPO listing row read 2026-08-21. Stage-A screen — gate decisive from title and instrument, RFP DOCX not deep-read.", st:"TN", amt:null, amtNote:"insurance carrier procurement; no stated value"},
+ {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Oct 20, 2026",days:26,effort:"—",path:"mission: food service",status:"UPDATED",title:"TN — Dining Services, Public Safety Training Academy (RFP 32101-01232026-SR1, Amd 3)",url:"https://www.tn.gov/content/dam/tn/generalservices/documents/cpo/rfp-updates/32101-01232026-sr1/RFP_32101-01232026-SR1.pdf",source:"TN CPO",tier:"state",summary:"Food-service contract for the state Public Safety Training Academy — first screened out 2026-07-07, re-affirmed at Amendment 1 (07-24), then aged off when it closed 8/05. Amendment 2 (listing marked UPDATED 08/20) extends the response deadline to 10/20/2026 per the CPO listing read 2026-08-21, so it re-enters the audit trail. Amendment 3 (dated 9/11, listing marked UPDATED 09/11/2026, read 2026-09-14) only revises the schedule of events: State answers to first-round questions 9/11, a second written question round (five max) due 9/18 2:00 CT, State answers 10/12, response deadline 10/20 2:00 CT unchanged, intent to award 11/18. The amendment header reads RFP 32101-02132026-SR1 (transposed digits); the listing and folder read 01232026. Mission-boundary screen unchanged.", st:"TN", amt:null, amtNote:"amount not stated"},
  // ── New this run 2026-08-31 (Monday full run): 11 NEW ledger candidates (4 CT RFI-007 documents clustered to one opportunity => 8 unique) + 1 manual NY find. One new GO. ──
- {rec:"GO",fit:83,elig:"High",eligWarn:false,inst:"contract",net:"no direct $ · statewide list access",netWarn:false,close:"Sep 29, 2026",days:11,effort:"Medium",path:"intent email window closed 9/11 · submit by 9/29 (11 bd)",title:"CT CSDE — RFI 007: K-5 Structured Literacy Professional Learning approved-provider list",url:"https://portal.ct.gov/-/media/sde/rfp/rfi007_k-5_structuredliterac-professionallearningopportunities_proposal.docx?rev=28efc5fc8e5b4454be13180877ac44c8&hash=DC4CC8C0278A63724C2A71BB4965EDCA",source:"CT CSDE",tier:"state",summary:"CSDE (Center for Literacy Research and Reading Success + Office of Dyslexia and Reading Disabilities) is building a state-approved list of K-5 structured-literacy PD providers, from which CT LEAs and individual educators independently select — the same approved-list mechanism as the HDT tutor-vendor hypothesis, here for Relay's core PD line. Open to any provider ('the CSDE invites providers to submit information about products or services'); rubric-based inclusion, not a ranked competition. No direct award dollars — the value is statewide market access, so Tier B despite fit 83. Sequence: questions close 9/1; addendum posts 9/9; intent-to-apply email to cody.fusco@ct.gov due 9/11 (9 bd); SharePoint submission (application + checklist + scope/sequence + completion doc + staff resumes) due 9/29 4:00 PM. Full RFI DOCX (proposal + application + checklist + rubric xlsx) read 2026-08-31. FAQ addendum (2 pp, 9 Q&As) posted and read 2026-09-10: RFI live and on schedule; intent email confirmed due 9/11; second name field = the specific PL offering; LEA/school-serving delivery models eligible (no individual-educator contracting required); inline or attached responses, no page limit; digital badge/LMS record satisfies item 2d; resumes for key staff per function; CSDE prefers reviewer login access for online-platform evidence. Deadline 9/29 reconfirmed on the CSDE page 2026-09-10, 2026-09-11, and 2026-09-14 (intent-to-apply window closed 9/11; whether Relay sent the email is not observable by this scan)."},
- {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"grant",net:"—",netWarn:false,close:"Sep 22, 2026",days:6,effort:"—",path:"closed continuation · 27 named LEAs",title:"NJ — FOCUS Cohort 2 Year 2 Continuation (universal literacy screeners)",url:"https://www.nj.gov/education/grants/opportunities/2027/27-TL08-G03_NGO.shtml",source:"NJ DOE",tier:"state",summary:"Twelve-month continuation 'open to the 27 New Jersey Local Education Agencies (LEAs) that were selected through a competitive process in Year one' — Relay cannot apply. $95,024 total across 27 awards; due 9/22/2026. NGO page read 2026-08-31."},
- {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"grant",net:"—",netWarn:false,close:"Sep 22, 2026",days:6,effort:"—",path:"closed continuation · Year One LEAs",title:"NJ — COACH Literacy Coaching Continuation (year 2 of 5)",url:"https://www.nj.gov/education/grants/opportunities/2027/27-ET07-G03_NGO.shtml",source:"NJ DOE",tier:"state",summary:"K-12 literacy-coach continuation for 'LEAs selected through a competitive process in Year One' (40 awards, $6,327,000, federal CLSD funds; due 9/22/2026). NJDOE itself trains and supports the coach cohort, so there is no vendor slot to convert to a hypothesis. NGO page read 2026-08-31."},
- {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"grant",net:"—",netWarn:false,close:"Oct 15, 2026",days:23,effort:"—",path:"CT IHEs only · dual-credit tuition",title:"CT CSDE — Dual Credit Opportunity Grant 2026-27",url:"https://portal.ct.gov/-/media/sde/rfp/ed713_csde_dual_credit_opportunity_grant-2026-2027.pdf?rev=79ebca6bd8974e4d80507678fc3c2114&hash=3E1E67359E7E6081B088C77EDE1CB8CF",source:"CT CSDE",tier:"state",summary:"'An applicant must be a Connecticut IHE' demonstrating 2025-26 dual/concurrent enrollment of high-need HS students; reimburses tuition at $300/student. Outside eligibility and mission. Due 10/15/2026 5:00 PM. PDF read 2026-08-31."},
- {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"—",days:null,effort:"—",path:"already awarded",title:"CT CSDE — Personal Service Agreement 26SDE0088AA (RMC Corp)",url:"https://portal.ct.gov/-/media/sde/rfp/26sde0088aa_rfp862_rmc_corp_psa_fullyexecuted_08042026.pdf?rev=72196cf986cc46e0b83ec452b24fbccb&hash=055D50FD939181258BADFD2D7B039D92",source:"CT CSDE",tier:"state",summary:"Fully-executed PSA posted 8/4/2026 to the CSDE RFP page — an awarded contract (RFP 862 outcome), not an open solicitation. Kept for the audit trail only."},
- {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Oct 7, 2026",days:17,effort:"—",path:"mission: SpEd dispute mediation",title:"IN DOE — IDEA Dispute Resolution State Mediation & Facilitation (007000000088362)",url:"https://www.in.gov/idoa/proc/solicitations/files/007000000088362.zip",source:"IN IDOA",tier:"state",summary:"State-internal fee-for-service mediation/facilitation of IDEA disputes for IDOE — the canonical procurement false-positive; not a Relay service line. Email bids due 10/7/2026 2:00 PM ET."},
- {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"grant",net:"—",netWarn:false,close:"Nov 13, 2026",days:44,effort:"—",path:"mission: adult basic education",title:"NY — NYSED RFP 290: WIOA Title II / WEP Adult Education Funding 2027-2032",url:"https://www.nysed.gov/funding-opportunities/rfp-290-workforce-innovation-and-opportunity-act-title-ii-and-welfare",source:"NYSED (manual)",tier:"state",summary:"$52.9M/yr across adult basic education, IELCE, corrections education, and Literacy Zones for 7/2027-6/2032; due 11/13/2026 5:00 PM ET. Eligibility requires 'demonstrated effectiveness in providing adult education and literacy activities' — direct adult literacy services, not educator prep. MANUAL find: the nysed_grants fetcher failed on an SSL cert error this run, so the page was checked via curl (43 opportunities on page, this the only one not in the seen ledger)."},
+ {rec:"GO",fit:83,elig:"High",eligWarn:false,inst:"contract",net:"no direct $ · statewide list access",netWarn:false,close:"Sep 29, 2026",days:11,effort:"Medium",path:"intent email window closed 9/11 · submit by 9/29 (11 bd)",title:"CT CSDE — RFI 007: K-5 Structured Literacy Professional Learning approved-provider list",url:"https://portal.ct.gov/-/media/sde/rfp/rfi007_k-5_structuredliterac-professionallearningopportunities_proposal.docx?rev=28efc5fc8e5b4454be13180877ac44c8&hash=DC4CC8C0278A63724C2A71BB4965EDCA",source:"CT CSDE",tier:"state",summary:"CSDE (Center for Literacy Research and Reading Success + Office of Dyslexia and Reading Disabilities) is building a state-approved list of K-5 structured-literacy PD providers, from which CT LEAs and individual educators independently select — the same approved-list mechanism as the HDT tutor-vendor hypothesis, here for Relay's core PD line. Open to any provider ('the CSDE invites providers to submit information about products or services'); rubric-based inclusion, not a ranked competition. No direct award dollars — the value is statewide market access, so Tier B despite fit 83. Sequence: questions close 9/1; addendum posts 9/9; intent-to-apply email to cody.fusco@ct.gov due 9/11 (9 bd); SharePoint submission (application + checklist + scope/sequence + completion doc + staff resumes) due 9/29 4:00 PM. Full RFI DOCX (proposal + application + checklist + rubric xlsx) read 2026-08-31. FAQ addendum (2 pp, 9 Q&As) posted and read 2026-09-10: RFI live and on schedule; intent email confirmed due 9/11; second name field = the specific PL offering; LEA/school-serving delivery models eligible (no individual-educator contracting required); inline or attached responses, no page limit; digital badge/LMS record satisfies item 2d; resumes for key staff per function; CSDE prefers reviewer login access for online-platform evidence. Deadline 9/29 reconfirmed on the CSDE page 2026-09-10, 2026-09-11, and 2026-09-14 (intent-to-apply window closed 9/11; whether Relay sent the email is not observable by this scan).", st:"CT", amt:null, amtNote:"no direct award dollars; statewide approved-list access"},
+ {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"grant",net:"—",netWarn:false,close:"Sep 22, 2026",days:6,effort:"—",path:"closed continuation · 27 named LEAs",title:"NJ — FOCUS Cohort 2 Year 2 Continuation (universal literacy screeners)",url:"https://www.nj.gov/education/grants/opportunities/2027/27-TL08-G03_NGO.shtml",source:"NJ DOE",tier:"state",summary:"Twelve-month continuation 'open to the 27 New Jersey Local Education Agencies (LEAs) that were selected through a competitive process in Year one' — Relay cannot apply. $95,024 total across 27 awards; due 9/22/2026. NGO page read 2026-08-31.", st:"NJ", amt:95024, amtNote:"$95,024 total across 27 continuation awards"},
+ {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"grant",net:"—",netWarn:false,close:"Sep 22, 2026",days:6,effort:"—",path:"closed continuation · Year One LEAs",title:"NJ — COACH Literacy Coaching Continuation (year 2 of 5)",url:"https://www.nj.gov/education/grants/opportunities/2027/27-ET07-G03_NGO.shtml",source:"NJ DOE",tier:"state",summary:"K-12 literacy-coach continuation for 'LEAs selected through a competitive process in Year One' (40 awards, $6,327,000, federal CLSD funds; due 9/22/2026). NJDOE itself trains and supports the coach cohort, so there is no vendor slot to convert to a hypothesis. NGO page read 2026-08-31.", st:"NJ", amt:6327000, amtNote:"$6,327,000 across 40 continuation awards"},
+ {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"grant",net:"—",netWarn:false,close:"Oct 15, 2026",days:23,effort:"—",path:"CT IHEs only · dual-credit tuition",title:"CT CSDE — Dual Credit Opportunity Grant 2026-27",url:"https://portal.ct.gov/-/media/sde/rfp/ed713_csde_dual_credit_opportunity_grant-2026-2027.pdf?rev=79ebca6bd8974e4d80507678fc3c2114&hash=3E1E67359E7E6081B088C77EDE1CB8CF",source:"CT CSDE",tier:"state",summary:"'An applicant must be a Connecticut IHE' demonstrating 2025-26 dual/concurrent enrollment of high-need HS students; reimburses tuition at $300/student. Outside eligibility and mission. Due 10/15/2026 5:00 PM. PDF read 2026-08-31.", st:"CT", amt:null, amtNote:"$300 per student reimbursement; pool not stated"},
+ {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"—",days:null,effort:"—",path:"already awarded",title:"CT CSDE — Personal Service Agreement 26SDE0088AA (RMC Corp)",url:"https://portal.ct.gov/-/media/sde/rfp/26sde0088aa_rfp862_rmc_corp_psa_fullyexecuted_08042026.pdf?rev=72196cf986cc46e0b83ec452b24fbccb&hash=055D50FD939181258BADFD2D7B039D92",source:"CT CSDE",tier:"state",summary:"Fully-executed PSA posted 8/4/2026 to the CSDE RFP page — an awarded contract (RFP 862 outcome), not an open solicitation. Kept for the audit trail only.", st:"CT", amt:null, amtNote:"awarded contract; value not stated"},
+ {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"contract",net:"—",netWarn:false,close:"Oct 7, 2026",days:17,effort:"—",path:"mission: SpEd dispute mediation",title:"IN DOE — IDEA Dispute Resolution State Mediation & Facilitation (007000000088362)",url:"https://www.in.gov/idoa/proc/solicitations/files/007000000088362.zip",source:"IN IDOA",tier:"state",summary:"State-internal fee-for-service mediation/facilitation of IDEA disputes for IDOE — the canonical procurement false-positive; not a Relay service line. Email bids due 10/7/2026 2:00 PM ET.", st:"IN", amt:null, amtNote:"amount not stated"},
+ {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"grant",net:"—",netWarn:false,close:"Nov 13, 2026",days:44,effort:"—",path:"mission: adult basic education",title:"NY — NYSED RFP 290: WIOA Title II / WEP Adult Education Funding 2027-2032",url:"https://www.nysed.gov/funding-opportunities/rfp-290-workforce-innovation-and-opportunity-act-title-ii-and-welfare",source:"NYSED (manual)",tier:"state",summary:"$52.9M/yr across adult basic education, IELCE, corrections education, and Literacy Zones for 7/2027-6/2032; due 11/13/2026 5:00 PM ET. Eligibility requires 'demonstrated effectiveness in providing adult education and literacy activities' — direct adult literacy services, not educator prep. MANUAL find: the nysed_grants fetcher failed on an SSL cert error this run, so the page was checked via curl (43 opportunities on page, this the only one not in the seen ledger).", st:"NY", amt:52900000, amtNote:"$52.9M per year, 2027-2032"},
  // US Embassy Jakarta media-literacy grant aged off 2026-09-04 (closed 9/2).
- {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"grant (forecast)",net:"—",netWarn:false,close:"forecast",days:null,effort:"—",path:"mission: clinical oncology",title:"NIH — Paul Calabresi Career Development Award in Clinical Oncology (NOT-CA-25-105)",url:GG+"359889",source:"grants.gov",summary:"Forecast of a clinical-oncology career-development program for physician-researchers. 'K12' here is the NIH mentored-career award mechanism, not K-12 schooling — keyword false positive."},
+ {rec:"NO_GO",fit:null,elig:"—",eligWarn:false,inst:"grant (forecast)",net:"—",netWarn:false,close:"forecast",days:null,effort:"—",path:"mission: clinical oncology",title:"NIH — Paul Calabresi Career Development Award in Clinical Oncology (NOT-CA-25-105)",url:GG+"359889",source:"grants.gov",summary:"Forecast of a clinical-oncology career-development program for physician-researchers. 'K12' here is the NIH mentored-career award mechanism, not K-12 schooling — keyword false positive.", st:"US", amt:null, amtNote:"forecast; amount not stated"},
  // ── New this run 2026-09-04: 1 NEW candidate, screened out on legal eligibility. ──
- {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"grant",net:"—",netWarn:false,close:"Nov 4, 2026",days:37,effort:"—",path:"1890 land-grant universities only",title:"USDA-NIFA — 1890 Institution Capacity Building Grants Program (10.216)",url:GG+"363796",source:"grants.gov",summary:"Teaching/research/extension capacity building at 1890 land-grant universities (USDA-NIFA-CBGP-011698). 'Applications may only be submitted by eligible 1890 Land-grant Universities (7 U.S.C. 3152(d)(2))' — a closed list of 19 named institutions; Relay is not one. $50k–$750k per award, ~$56M / ~125 awards, no cost share, due 11/4/2026. Collaborative projects may subcontract to ineligible organizations, but the subcontract must advance capacity building at the 1890 LGU itself — no Relay target account implicated, so no hypothesis created. Matched on 'educator preparation'; verified via fetchOpportunity API 2026-09-04."},
+ {rec:"NO_GO",fit:null,elig:"No",eligWarn:true,inst:"grant",net:"—",netWarn:false,close:"Nov 4, 2026",days:37,effort:"—",path:"1890 land-grant universities only",title:"USDA-NIFA — 1890 Institution Capacity Building Grants Program (10.216)",url:GG+"363796",source:"grants.gov",summary:"Teaching/research/extension capacity building at 1890 land-grant universities (USDA-NIFA-CBGP-011698). 'Applications may only be submitted by eligible 1890 Land-grant Universities (7 U.S.C. 3152(d)(2))' — a closed list of 19 named institutions; Relay is not one. $50k–$750k per award, ~$56M / ~125 awards, no cost share, due 11/4/2026. Collaborative projects may subcontract to ineligible organizations, but the subcontract must advance capacity building at the 1890 LGU itself — no Relay target account implicated, so no hypothesis created. Matched on 'educator preparation'; verified via fetchOpportunity API 2026-09-04.", st:"US", amt:56000000, amtNote:"~$56M pool, $50k to $750k per award, ~125 awards"},
  // ── New this run 2026-09-11: 1 NEW candidate — TX TFC furniture/fixture RFP for Texas School for the Deaf (ESBD 0010514), screened out on the mission boundary and already Closed (due 9/10) — digest-only, not a feed row. ──
  // ── 2026-09-14 (Monday full run): 0 NEW, 1 UPDATED = TN dining RFP 32101-01232026-SR1 Amendment 3 (schedule only), still NO_GO. ──
  // NYC alt-cert (RFI I1869040) remains a cultivation item — a CLOSED RFI (window ended 1/23/2026); follow-on RFP expected H2 2026 (window now open — monitor PASSPort/City Record). See Hypotheses.
@@ -582,6 +631,62 @@ async function syncNow(){
   setSync();
 }
 function schedSync(){ clearTimeout(tTimer); tTimer = setTimeout(syncNow, 2500); }
+// ── US state outlines: Census cartographic boundaries via us-atlas (ISC), Albers USA projection in a
+//    975×610 frame, simplified for the sheet. Shell geometry, never edited by a run. ──
+const US_STATES=[
+{"id":"AL","cx":672,"cy":432,"d":"M648,492L648,492L648,492ZM642,384L689,380L702,427L710,440L707,443L706,450L709,457L708,465L711,469L694,471L661,474L660,477L665,481L666,486L664,490L659,490L656,488L653,482L652,490L646,489L642,455L644,386Z"},
+{"id":"AK","cx":103,"cy":523,"d":"M104,552L104,552L104,552ZM99,570L103,565L105,569ZM95,582L95,582L95,582ZM93,575L99,571L103,571L105,573L95,580ZM93,583L93,583L93,583ZM89,588L89,588L89,588ZM72,594L72,594L72,594ZM71,592L71,592L71,592ZM68,593L68,593L68,593ZM66,590L66,590L66,590ZM68,564L68,564L68,564ZM61,591L61,591L61,591ZM58,592L58,592L58,592ZM66,524L66,524L66,524ZM56,596L56,596L56,596ZM45,597L45,597L45,597ZM43,595L43,595L43,595ZM41,596L41,596L41,596ZM44,547L50,547L51,551L48,552ZM31,601L34,600L38,596L40,598L37,601ZM51,505L59,501L66,500L65,504L71,505L74,504L71,500L73,498L67,496L66,492L59,484L62,481L67,481L70,479L72,475L75,471L78,471L82,468L87,468L89,465L94,466L95,469L101,469L104,472L109,471L114,473L123,474L126,472L133,474L147,547L155,547L162,552L164,555L167,552L167,548L169,546L176,552L181,554L193,565L200,567L203,573L201,578L198,575L193,574L188,565L183,563L182,560L178,557L176,557L171,551L175,558L173,557L168,559L160,554L151,551L141,550L135,552L126,547L124,545L119,547L121,553L114,554L109,560L105,560L107,552L107,549L112,544L106,546L102,553L100,557L96,560L96,562L100,564L96,569L90,572L86,576L86,578L82,579L77,586L71,586L67,589L56,592L53,594L47,595L49,592L57,590L62,585L66,585L75,579L81,573L84,563L80,565L78,563L76,566L71,561L65,564L64,558L66,557L64,551L58,553L53,547L54,545L51,538L54,534L61,526L64,528L67,525L71,525L73,523L72,517L73,514L68,517L59,516L55,514L54,509L56,509ZM25,603L29,599L31,600ZM28,573L28,573L28,573ZM20,602L20,602L20,602ZM27,568L27,568L27,568ZM16,603L16,603L16,603ZM34,518L39,518L45,522L41,524L39,521ZM7,603L7,603L7,603ZM23,540L23,540L23,540ZM0,602L0,602L0,602ZM-6,601L-6,601L-6,601ZM-10,599L-10,599L-10,599ZM-11,601L-11,601L-11,601ZM-15,601L-15,601L-15,601ZM-18,600L-18,600L-18,600ZM-20,597L-20,597L-20,597ZM-30,593L-30,593L-30,593ZM-35,593L-35,593L-35,593ZM-41,589L-41,589L-41,589ZM-56,577L-56,577L-56,577ZM-58,571L-58,571L-58,571ZM197,577L197,577L197,577ZM196,577L196,577L196,577ZM195,575L195,575L195,575ZM188,570L188,570L188,570ZM187,569L187,569L187,569ZM186,577L186,577L186,577ZM185,573L187,570L194,576L196,580L190,578ZM183,574L183,574L183,574ZM180,567L182,565L185,564L189,567L184,569L183,572ZM175,556L178,557L181,563L180,566ZM174,565L177,563L181,573L176,568ZM173,566L173,566L173,566ZM169,561L172,558L175,559L177,563L174,562L174,565ZM121,555L121,555L121,555ZM120,551L120,551L120,551Z"},
+{"id":"AZ","cx":208,"cy":382,"d":"M145,407L149,407L150,401L147,400L148,392L152,389L154,380L157,377L163,374L160,370L158,363L156,359L157,356L159,353L158,345L160,331L167,331L170,335L173,331L176,313L203,318L239,324L265,328L247,456L208,450L172,429L142,412Z"},
+{"id":"CO","cx":332,"cy":290,"d":"M277,237L301,240L333,244L361,247L395,249L394,272L390,341L372,339L349,338L315,334L265,328L268,302L268,299Z"},
+{"id":"FL","cx":768,"cy":516,"d":"M815,594L815,594L815,594ZM813,596L813,596L813,596ZM807,599L807,599L807,599ZM794,604L795,602L800,598L805,600L796,604ZM790,605L790,605L790,605ZM786,605L786,605L786,605ZM777,558L777,558L777,558ZM770,606L770,606L770,606ZM720,495L720,495L720,495ZM711,469L714,475L766,471L767,476L770,476L769,466L770,465L780,466L783,476L787,486L795,500L806,514L805,517L807,522L812,529L820,544L823,554L824,575L822,574L821,580L822,583L822,587L820,586L807,590L805,585L801,578L793,574L792,575L785,563L780,559L781,555L778,557L769,546L766,543L771,533L765,530L767,534L765,537L762,533L762,527L764,517L762,510L759,505L755,505L750,500L746,498L745,495L740,491L732,487L727,487L726,492L723,492L716,497L712,498L714,501L707,500L708,497L706,494L696,488L689,486L681,486L664,490L666,486L665,481L660,477L661,474L694,471Z"},
+{"id":"GA","cx":736,"cy":428,"d":"M689,380L713,377L735,374L732,379L732,382L738,385L741,385L744,391L748,396L755,400L756,402L762,406L766,412L771,414L774,423L777,424L781,430L781,433L786,435L787,436L783,442L781,451L781,454L778,460L780,461L780,466L770,465L769,466L770,476L767,476L766,471L714,475L711,469L708,465L709,457L706,450L707,443L710,440L702,427Z"},
+{"id":"IN","cx":665,"cy":269,"d":"M640,230L642,231L647,231L652,228L686,224L686,225L688,247L693,284L691,286L694,292L688,295L683,295L684,298L680,304L677,305L676,312L674,313L669,309L666,312L666,314L662,315L661,313L657,316L655,319L651,316L647,315L639,320L638,317L642,309L647,298L646,293L643,288L645,284Z"},
+{"id":"KS","cx":456,"cy":309,"d":"M394,272L422,273L465,275L510,275L512,277L516,278L514,286L519,293L522,295L523,344L489,344L459,344L433,343L390,341Z"},
+{"id":"ME","cx":919,"cy":93,"d":"M940,115L940,115L940,115ZM938,116L938,116L938,116ZM936,112L936,112L936,112ZM932,116L932,116L932,116ZM934,125L934,125L934,125ZM931,119L931,119L931,119ZM930,116L930,116L930,116ZM910,150L905,145L891,102L895,103L894,99L897,99L895,96L900,86L898,83L898,76L900,74L899,67L906,48L909,48L910,51L912,52L917,49L923,46L930,50L937,74L939,80L945,80L946,87L949,90L952,88L957,95L955,99L953,99L950,106L947,104L944,110L939,114L937,110L935,111L937,115L936,118L932,114L931,110L929,120L930,123L921,129L920,132L918,131L913,138Z"},
+{"id":"MA","cx":897,"cy":172,"d":"M928,187L928,187L928,187ZM918,188L921,184L925,187ZM871,168L884,165L903,161L906,156L909,155L911,159L914,158L909,166L917,171L922,178L929,175L931,177L920,183L918,179L915,185L913,186L911,183L910,182L908,181L905,176L899,178L899,178L871,184L871,183Z"},
+{"id":"MN","cx":525,"cy":132,"d":"M479,71L511,71L511,62L516,64L518,73L520,77L531,79L532,81L536,80L540,78L551,82L553,87L555,84L563,87L566,91L571,90L577,86L578,89L588,88L592,91L596,91L590,94L582,98L573,106L570,109L559,119L560,121L556,122L556,136L551,139L548,144L548,147L551,150L550,154L550,162L549,166L554,170L557,170L564,175L565,178L572,182L576,187L576,193L549,194L516,195L491,195L491,154L487,152L484,147L489,142L489,140L489,131L486,123L485,102L481,89L481,78Z"},
+{"id":"NJ","cx":862,"cy":230,"d":"M849,246L850,244L851,241L861,231L854,226L850,221L852,216L850,214L855,204L870,209L869,216L869,217L867,221L871,222L872,225L873,237L870,247L867,251L865,257L863,259L863,254L859,254L852,250L849,246Z"},
+{"id":"NC","cx":801,"cy":351,"d":"M864,329L864,329L864,329ZM863,350L864,348L871,343ZM756,334L780,331L812,326L840,320L859,316L866,328L864,328L860,319L856,317L859,323L857,326L851,330L847,330L847,333L856,330L859,330L860,336L860,330L863,329L866,335L860,344L852,345L843,343L854,347L850,356L855,353L859,354L856,360L862,350L863,350L856,361L851,361L844,365L838,370L834,377L833,384L829,383L823,386L798,368L778,371L777,369L772,365L749,367L746,368L735,374L713,377L713,371L717,369L717,366L721,363L726,362L733,356L735,356L738,350L741,351L747,345L751,346L755,338Z"},
+{"id":"ND","cx":429,"cy":104,"d":"M377,66L404,68L445,70L479,71L481,78L481,89L485,102L486,123L489,131L489,140L460,139L412,137L371,134Z"},
+{"id":"OK","cx":471,"cy":376,"d":"M372,339L390,341L433,343L459,344L489,344L523,344L523,355L527,381L526,421L520,418L517,416L512,413L511,415L506,414L501,416L499,415L493,418L492,420L485,415L484,417L481,414L476,419L475,414L472,417L467,413L463,416L462,413L454,409L452,411L443,407L439,407L438,404L429,403L424,398L426,354L396,352L372,351Z"},
+{"id":"PA","cx":806,"cy":226,"d":"M756,209L768,200L769,206L800,201L841,192L847,197L850,202L855,204L850,214L852,216L850,221L854,226L861,231L851,241L847,242L845,245L816,251L782,257L765,260L761,239Z"},
+{"id":"SD","cx":430,"cy":172,"d":"M369,156L371,134L412,137L460,139L489,140L489,142L484,147L487,152L491,154L491,195L488,195L488,200L491,204L488,212L491,218L488,218L487,215L476,210L467,210L466,212L457,207L457,206L434,205L404,204L365,201Z"},
+{"id":"TX","cx":434,"cy":469,"d":"M372,351L396,352L426,354L424,398L429,403L438,404L439,407L443,407L452,411L454,409L462,413L463,416L467,413L472,417L475,414L476,419L481,414L484,417L485,415L492,420L493,418L499,415L501,416L506,414L511,415L512,413L517,416L520,418L526,421L529,423L535,423L535,435L535,458L540,463L540,467L542,469L545,476L546,484L542,490L543,502L539,507L541,510L535,511L522,517L527,513L522,514L524,509L518,511L517,514L520,515L520,519L523,519L510,530L492,539L480,548L475,555L470,566L470,574L473,587L470,576L470,569L472,560L480,546L489,541L489,540L484,542L482,540L482,544L477,547L474,553L469,552L473,556L469,564L468,576L469,583L472,588L471,592L474,595L467,597L464,593L452,592L447,589L443,588L440,585L434,584L431,574L428,570L428,559L425,556L420,552L419,548L412,541L410,534L406,526L405,522L398,513L394,511L390,506L378,505L373,503L372,505L366,505L364,510L361,517L357,522L353,521L348,517L337,511L330,504L328,498L328,492L325,487L323,480L316,475L312,470L309,468L306,463L302,460L299,454L296,452L295,447L339,451L363,453L365,430L367,408L371,351Z"},
+{"id":"WY","cx":308,"cy":195,"d":"M369,156L365,201L361,247L333,244L301,240L277,237L244,232L247,210L256,154L258,142L263,143L298,148L339,153Z"},
+{"id":"CT","cx":886,"cy":190,"d":"M871,184L899,178L899,178L902,191L902,193L893,197L885,198L882,203L874,208L872,206L876,203L874,201Z"},
+{"id":"MO","cx":560,"cy":312,"d":"M502,262L521,262L545,261L571,260L576,265L576,273L578,280L584,286L590,290L591,297L595,296L601,298L598,309L598,313L606,321L607,320L614,326L615,332L614,333L619,340L621,340L620,349L617,349L617,351L616,351L615,352L615,354L612,358L614,360L612,363L600,364L605,357L604,352L586,353L550,355L523,355L523,344L522,295L519,293L514,286L516,278L512,277L510,275L505,268Z"},
+{"id":"WV","cx":767,"cy":285,"d":"M733,295L738,293L740,290L739,285L741,280L744,283L746,281L745,278L746,273L750,269L754,269L758,263L760,256L761,247L759,241L761,239L765,260L782,257L784,269L790,261L792,262L794,257L800,258L805,253L811,256L814,260L813,265L803,259L803,266L797,277L794,275L790,286L784,283L784,287L780,297L776,305L777,309L773,310L767,315L761,318L758,316L755,320L750,319L747,313L741,311L734,302Z"},
+{"id":"IL","cx":615,"cy":270,"d":"M576,265L577,259L581,258L584,252L584,248L581,245L582,241L588,239L593,236L596,231L596,224L592,222L587,215L618,214L634,212L634,217L637,222L640,230L645,284L643,288L646,293L647,298L642,309L638,317L639,320L637,323L639,327L632,330L634,335L632,337L624,334L621,338L621,340L619,340L614,333L615,332L614,326L607,320L606,321L598,313L598,309L601,298L595,296L591,297L590,290L584,286L578,280L576,273Z"},
+{"id":"NM","cx":311,"cy":393,"d":"M265,328L315,334L349,338L372,339L372,351L371,351L367,408L365,430L363,453L339,451L295,447L296,452L264,448L263,458L247,456Z"},
+{"id":"AR","cx":564,"cy":391,"d":"M523,355L550,355L586,353L604,352L605,357L600,364L612,363L613,367L608,369L610,372L605,378L607,383L603,387L604,389L598,393L599,400L595,402L593,409L590,411L592,415L589,415L590,418L588,420L591,430L589,433L569,434L535,435L535,423L529,423L526,421L527,381Z"},
+{"id":"CA","cx":82,"cy":288,"d":"M77,374L81,377L79,378ZM75,384L78,390L76,389ZM65,358L65,358L65,358ZM58,374L58,374L58,374ZM57,355L63,359L57,357ZM50,355L54,355L52,358ZM47,353L47,353L47,353ZM33,160L84,175L100,179L83,246L157,356L156,359L158,363L160,370L163,374L157,377L154,380L152,389L148,392L147,400L150,401L149,407L145,407L99,402L98,398L99,388L97,382L92,376L86,370L82,369L82,362L76,362L70,357L69,354L65,349L59,348L55,345L49,344L46,340L49,335L50,328L46,325L47,321L42,313L37,300L35,296L36,289L40,286L38,281L35,281L31,274L33,271L32,267L33,261L35,261L35,266L38,270L39,265L36,257L39,256L38,253L33,260L29,255L26,253L28,250L27,243L24,240L20,229L22,227L21,219L24,216L24,209L22,202L18,197L19,193L27,184L28,179L31,173L32,166L30,164Z"},
+{"id":"DE","cx":853,"cy":260,"d":"M849,246L849,246L849,246ZM845,245L847,242L851,241L850,244L849,249L853,252L855,258L860,263L861,263L864,270L853,273Z"},
+{"id":"DC","cx":828,"cy":268,"d":"M826,267L830,267L828,270Z"},
+{"id":"HI","cx":300,"cy":574,"d":"M305,584L310,578L310,573L315,576L322,578L326,582L326,584L332,589L329,593L322,595L317,598L314,603L309,600L309,594ZM292,558L294,555L296,559L300,557L306,561L305,564L299,566L297,561ZM292,567L292,567L292,567ZM284,558L287,558L289,560L286,562ZM279,554L280,551L291,553L288,555ZM258,543L261,543L265,540L267,546L271,549L262,549ZM226,533L231,528L235,529L236,534L233,536L230,536ZM216,537L220,533L217,538Z"},
+{"id":"IA","cx":540,"cy":227,"d":"M491,195L516,195L549,194L576,193L577,196L579,199L577,202L580,211L586,212L587,215L592,222L596,224L596,231L593,236L588,239L582,241L581,245L584,248L584,252L581,258L577,259L576,265L571,260L545,261L521,262L502,262L500,259L501,255L499,245L499,242L496,240L497,234L494,230L491,218L488,212L491,204L488,200L488,195Z"},
+{"id":"KY","cx":688,"cy":321,"d":"M621,340L621,338L624,334L632,337L634,335L632,330L639,327L637,323L639,320L647,315L651,316L655,319L657,316L661,313L662,315L666,314L666,312L669,309L674,313L676,312L677,305L680,304L684,298L683,295L688,295L694,292L691,286L693,284L699,283L704,290L710,290L714,293L716,291L721,292L727,288L728,292L733,295L734,302L741,311L747,313L741,320L735,325L733,330L730,332L729,334L720,339L704,341L692,341L681,343L672,343L645,346L641,345L641,350L617,351L617,349L620,349ZM616,351L615,352L616,351Z"},
+{"id":"MD","cx":832,"cy":263,"d":"M850,285L849,285L850,285ZM847,281L847,281L847,281ZM782,257L816,251L845,245L853,273L864,270L863,280L855,284L852,285L851,282L848,276L846,279L841,274L842,271L846,271L839,266L839,259L842,252L839,254L837,254L836,259L838,263L836,269L838,274L841,277L840,279L844,284L838,281L835,282L830,278L827,280L825,278L827,274L828,270L830,267L826,267L818,264L819,262L814,260L811,256L805,253L800,258L794,257L792,262L790,261L784,269Z"},
+{"id":"MI","cx":670,"cy":167,"d":"M677,131L682,132L680,133ZM663,133L663,133L663,133ZM662,139L663,135L665,138ZM661,136L661,136L661,136ZM659,142L659,142L659,142ZM657,150L657,150L657,150ZM655,153L655,153L655,153ZM646,140L646,140L646,140ZM652,228L655,224L659,216L660,205L659,198L652,184L654,180L652,175L655,168L655,160L657,159L657,155L661,154L664,148L665,151L664,156L666,158L668,153L667,146L674,142L670,138L675,133L681,135L685,135L687,138L697,140L701,147L699,149L702,154L702,162L699,166L699,169L695,171L694,177L699,180L705,171L710,168L715,172L719,186L722,191L721,200L716,199L715,207L712,210L713,213L708,222L686,225L686,224ZM601,92L610,86L614,84L610,89L603,93ZM585,123L591,120L594,117L601,116L613,106L619,101L624,100L622,102L615,112L616,117L619,112L624,112L628,114L633,121L644,121L652,115L662,114L670,111L670,118L676,118L683,115L684,121L690,126L693,124L694,128L685,127L681,129L676,127L674,131L671,128L663,127L661,130L657,132L653,131L650,135L645,139L648,134L644,135L643,138L638,140L632,153L630,151L631,148L627,147L628,140L622,137L623,135L612,134L607,131L590,128L588,124Z"},
+{"id":"MS","cx":618,"cy":437,"d":"M644,493L644,493L644,493ZM639,493L639,493L639,493ZM635,494L635,494L635,494ZM632,494L632,494L632,494ZM589,433L591,430L588,420L590,418L589,415L592,415L590,411L593,409L595,402L599,400L598,393L604,389L603,387L642,384L644,386L642,455L646,489L644,491L636,490L627,494L625,495L618,485L619,477L583,479L584,478L582,473L585,473L584,467L586,466L587,461L593,453L590,451L595,448L591,445L593,442L590,441L591,436Z"},
+{"id":"MT","cx":287,"cy":100,"d":"M198,39L233,46L265,52L303,57L340,62L377,66L371,134L369,156L339,153L298,148L263,143L258,142L256,154L253,148L250,148L250,151L237,148L235,151L228,149L227,152L225,149L224,142L219,139L220,134L219,132L215,118L208,123L205,120L206,115L209,114L208,109L213,96L209,96L205,90L205,88L201,80L195,74L197,69L193,62Z"},
+{"id":"NH","cx":893,"cy":140,"d":"M886,111L887,105L891,102L905,145L910,150L909,155L906,156L903,161L884,165L882,163L881,146L883,133L882,128L885,126L888,122L886,117Z"},
+{"id":"NY","cx":834,"cy":172,"d":"M899,196L899,196L899,196ZM897,198L897,198L897,198ZM869,217L867,221L869,217ZM816,154L816,154L816,154ZM814,154L814,154L814,154ZM768,200L776,192L780,186L777,182L775,176L784,172L796,170L800,172L809,169L813,167L817,162L819,161L817,154L819,152L815,150L815,146L820,141L822,138L829,128L832,124L858,118L859,127L862,134L861,140L864,145L864,149L867,150L871,168L871,183L871,184L874,201L876,203L872,206L874,208L874,211L877,208L891,204L895,200L900,202L896,206L886,213L872,219L869,216L870,209L855,204L850,202L847,197L841,192L800,201L769,206Z"},
+{"id":"OH","cx":724,"cy":253,"d":"M721,223L721,223L721,223ZM719,222L719,222L719,222ZM686,225L708,222L718,225L719,224L726,227L733,223L738,223L742,218L748,213L756,209L761,239L759,241L761,247L760,256L758,263L754,269L750,269L746,273L745,278L746,281L744,283L741,280L739,285L740,290L738,293L733,295L728,292L727,288L721,292L716,291L714,293L710,290L704,290L699,283L693,284L688,247Z"},
+{"id":"OR","cx":103,"cy":134,"d":"M71,70L74,74L77,74L80,80L79,87L86,91L94,90L98,91L103,95L112,94L118,96L123,95L136,96L139,95L171,102L172,107L175,109L176,112L167,124L164,129L162,130L157,137L158,140L162,143L158,150L149,191L122,185L100,179L84,175L33,160L31,157L32,149L34,146L33,140L43,126L45,121L57,92L61,81L62,75L65,71Z"},
+{"id":"TN","cx":674,"cy":361,"d":"M612,363L614,360L612,358L615,354L615,352L616,351L617,351L641,350L641,345L645,346L672,343L681,343L692,341L704,341L720,339L756,334L755,338L751,346L747,345L741,351L738,350L735,356L733,356L726,362L721,363L717,366L717,369L713,371L713,377L689,380L642,384L603,387L607,383L605,378L610,372L608,369L613,367Z"},
+{"id":"UT","cx":227,"cy":269,"d":"M198,201L200,202L247,210L244,232L277,237L268,299L268,302L265,328L239,324L203,318L176,313Z"},
+{"id":"VA","cx":803,"cy":304,"d":"M855,284L863,280L858,288L859,292L857,301L855,304L853,301L853,292ZM850,285L849,285L850,285ZM747,313L750,319L755,320L758,316L761,318L767,315L773,310L777,309L776,305L780,297L784,287L784,283L790,286L794,275L797,277L803,266L803,259L813,265L814,260L819,262L818,264L826,267L828,270L827,274L825,279L826,281L830,279L832,283L838,283L840,285L846,287L846,295L848,300L845,299L846,303L849,305L847,309L840,305L846,310L849,308L855,308L859,316L840,320L812,326L780,331L756,334L720,339L729,334L730,332L733,330L735,325L741,320Z"},
+{"id":"WA","cx":124,"cy":59,"d":"M93,51L93,51L93,51ZM99,25L99,25L99,25ZM99,20L99,20L99,20ZM98,23L98,23L98,23ZM95,31L99,28L99,31L97,33ZM96,18L96,18L96,18ZM94,20L94,20L94,20ZM95,13L95,13L95,13ZM91,21L96,20L98,22L96,27L92,24ZM91,19L91,19L91,19ZM184,36L171,92L171,102L139,95L136,96L123,95L118,96L112,94L103,95L98,91L94,90L86,91L79,87L80,80L77,74L74,74L71,70L66,69L64,65L66,60L70,59L66,57L67,55L71,54L67,51L67,43L68,34L66,30L66,23L70,20L77,27L81,28L90,33L95,33L95,38L92,43L97,39L95,46L92,52L96,52L96,47L98,42L102,38L101,31L98,25L101,27L102,21L99,19L100,14L115,19L140,25Z"},
+{"id":"WI","cx":595,"cy":167,"d":"M642,146L642,146L642,146ZM636,150L636,150L636,150ZM584,113L584,113L584,113ZM583,116L583,116L583,116ZM581,115L581,115L581,115ZM580,117L580,117L580,117ZM580,114L580,114L580,114ZM579,113L579,113L579,113ZM579,118L579,118L579,118ZM576,114L576,114L576,114ZM560,121L568,120L576,115L580,116L577,123L580,120L585,123L588,124L590,128L607,131L612,134L623,135L622,137L628,140L627,147L631,148L630,151L632,153L632,156L629,157L626,166L628,166L633,159L636,157L638,151L642,148L641,152L639,155L635,165L635,174L633,176L632,181L633,185L631,195L632,201L634,206L634,212L618,214L587,215L586,212L580,211L577,202L579,199L577,196L576,193L576,187L572,182L565,178L564,175L557,170L554,170L549,166L550,162L550,154L551,150L548,147L548,144L551,139L556,136L556,122Z"},
+{"id":"NE","cx":434,"cy":239,"d":"M365,201L404,204L434,205L457,206L457,207L466,212L467,210L476,210L487,215L488,218L491,218L494,230L497,234L496,240L499,242L499,245L501,255L500,259L502,262L505,268L510,275L465,275L422,273L394,272L395,249L361,247Z"},
+{"id":"SC","cx":779,"cy":392,"d":"M735,374L746,368L749,367L772,365L777,369L778,371L798,368L823,386L816,392L813,399L814,404L811,408L808,408L807,411L803,415L801,419L792,424L793,427L790,429L786,435L781,433L781,430L777,424L774,423L771,414L766,412L762,406L756,402L755,400L748,396L744,391L741,385L738,385L732,382L732,379Z"},
+{"id":"ID","cx":199,"cy":147,"d":"M171,102L171,92L184,36L198,39L193,62L197,69L195,74L201,80L205,88L205,90L209,96L213,96L208,109L209,114L206,115L205,120L208,123L215,118L219,132L220,134L219,139L224,142L225,149L227,152L228,149L235,151L237,148L250,151L250,148L253,148L256,154L247,210L200,202L198,201L160,193L149,191L158,150L162,143L158,140L157,137L162,130L164,129L167,124L176,112L175,109L172,107Z"},
+{"id":"NV","cx":142,"cy":252,"d":"M100,179L122,185L149,191L160,193L198,201L176,313L173,331L170,335L167,331L160,331L158,345L159,353L157,356L83,246Z"},
+{"id":"VT","cx":873,"cy":136,"d":"M858,118L874,114L886,111L886,117L888,122L885,126L882,128L883,133L881,146L882,163L884,165L871,168L867,150L864,149L864,145L861,140L862,134L859,127Z"},
+{"id":"LA","cx":576,"cy":478,"d":"M638,497L638,497L638,497ZM629,498L631,495L632,498ZM624,510L624,510L624,510ZM610,521L610,521L610,521ZM606,521L606,521L606,521ZM602,522L602,522L602,522ZM577,511L580,511L583,512L580,514ZM535,435L569,434L589,433L591,436L590,441L593,442L591,445L595,448L590,451L593,453L587,461L586,466L584,467L585,473L582,473L584,478L583,479L619,477L618,485L625,495L619,499L619,501L624,502L626,498L628,501L627,507L623,508L623,510L626,513L632,514L635,518L634,522L624,516L620,515L613,521L608,515L601,523L598,520L590,517L590,513L588,514L584,508L579,509L579,506L574,508L575,511L571,513L565,512L554,508L548,508L541,510L539,507L543,502L542,490L546,484L545,476L542,469L540,467L540,463L535,458Z"},
+{"id":"RI","cx":904,"cy":184,"d":"M911,183L913,186L909,188ZM908,188L908,188L908,188ZM907,196L907,196L907,196ZM902,193L902,191L899,178L905,176L908,181L910,182L907,181L908,191Z"}
+];
+const STATE_NAMES={"AL":"Alabama","AK":"Alaska","AZ":"Arizona","CO":"Colorado","FL":"Florida","GA":"Georgia","IN":"Indiana","KS":"Kansas","ME":"Maine","MA":"Massachusetts","MN":"Minnesota","NJ":"New Jersey","NC":"North Carolina","ND":"North Dakota","OK":"Oklahoma","PA":"Pennsylvania","SD":"South Dakota","TX":"Texas","WY":"Wyoming","CT":"Connecticut","MO":"Missouri","WV":"West Virginia","IL":"Illinois","NM":"New Mexico","AR":"Arkansas","CA":"California","DE":"Delaware","DC":"District of Columbia","HI":"Hawaii","IA":"Iowa","KY":"Kentucky","MD":"Maryland","MI":"Michigan","MS":"Mississippi","MT":"Montana","NH":"New Hampshire","NY":"New York","OH":"Ohio","OR":"Oregon","TN":"Tennessee","UT":"Utah","VA":"Virginia","WA":"Washington","WI":"Wisconsin","NE":"Nebraska","SC":"South Carolina","ID":"Idaho","NV":"Nevada","VT":"Vermont","LA":"Louisiana","RI":"Rhode Island"};
 function setSync(){
   const el = document.getElementById("syncchip"); if(!el) return;
   const m = {
@@ -619,9 +724,16 @@ const instBucket = s => { s=String(s||"").toLowerCase();
 DATA.forEach(r=>{ r._cls = instBucket(r.inst); });
 const TIER_LABEL = {federal:"Federal", state:"State", district:"District"};
 const tierOf = r => r.tier || (/grants\.gov|register|fed\.\s*reg|\bFR\b/i.test(r.source||"") ? "federal" : "state");
+// Place: the record's st field, else the two-letter title prefix, else nationwide for federal rows.
+const stOf = r => { if(r.st) return r.st; const m=String(r.title).match(/^([A-Z]{2})\b/);
+  if(m && STATE_NAMES[m[1]]) return m[1]; return tierOf(r)==="federal" ? "US" : ""; };
+const stName = c => c==="US" ? "Federal · nationwide" : (STATE_NAMES[c]||c);
+const amtOf = r => (typeof r.amt==="number" && r.amt>0) ? r.amt : 0;
+const fmtUsd = n => n>=1e6 ? "$"+(n/1e6).toFixed(n%1e6?1:0)+"M" : n>=1e3 ? "$"+Math.round(n/1e3)+"k" : "$"+n;
+const usdFull = n => "$"+n.toLocaleString("en-US");
 // Sheet vocabulary (operator-approved 2026-09-15): a scan run is a sitting, an opportunity a matter.
 const VOCAB = {run:"Sitting of", noun:"sitting", item:"matter", items:"matters", col:"Matter",
-  sheet:"docket", next:"Next action", days:"Days", open:"Open the posting"};
+  sheet:"docket", next:"Next action", days:"Days", open:"Open the posting", where:"Where the matters sit"};
 
 // ── Docket order: one scalar per section, the next date; numbers are assigned over the
 //    whole sheet once per load so a line keeps its No. whatever the filter. ──
@@ -635,7 +747,7 @@ const runNote = r => { const ids = (String(r.title).match(/[A-Za-z0-9]+-[A-Za-z0
   return ids.length ? (runParts().slice(1).find(n=>ids.some(id=>n.includes(id)))||"") : ""; };
 
 // ── App state ──
-let state = {view:"feed", cls:null, jur:null, q:"", sel:-1, notes:false};
+let state = {view:"feed", cls:null, jur:null, st:null, q:"", sel:-1, notes:false};
 let collapsed = new Set(Array.isArray(lsJson("fd2_collapsed",null))?lsJson("fd2_collapsed",null):["NO_GO"]);
 const keysOn = () => lsGet("fd2_keys","on")!=="off";
 const esc = s => String(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -658,15 +770,16 @@ function stamps(r, t, view){
 function applyFilters(rows){
   if(state.cls) rows = rows.filter(r=>r._cls===state.cls);
   if(state.jur) rows = rows.filter(r=>tierOf(r)===state.jur);
+  if(state.st) rows = rows.filter(r=>stOf(r)===state.st);
   if(state.q){
     const q = state.q.toLowerCase();
     rows = rows.filter(r=>(r.title+" "+r.summary+" "+(r.path||"")+" "+(r.source||"")+" "+(r.inst||"")+" "+(r.net||"")+" "+(tGet(r).note||"")).toLowerCase().includes(q));
   }
   return rows;
 }
-const filtersActive = () => !!(state.cls || state.jur || state.q);
+const filtersActive = () => !!(state.cls || state.jur || state.st || state.q);
 function clearFilters(){
-  state.cls=null; state.jur=null; state.q=""; document.getElementById("q").value="";
+  state.cls=null; state.jur=null; state.st=null; state.q=""; document.getElementById("q").value="";
 }
 function filtered(){
   let rows = DATA.slice();
@@ -727,6 +840,13 @@ function renderVerdict(){
   const dz = DATA.filter(r=>tGet(r).dismissed).length;
   const parts = runParts(), gen = parts[0]||"", runNotes = parts.slice(1);
   const soon = wins[0];
+  const live = DATA.filter(r=>r.rec!=="NO_GO"), stated = live.filter(amtOf);
+  const liveUsd = stated.reduce((a,r)=>a+amtOf(r),0), outUsd = DATA.filter(r=>r.rec==="NO_GO").reduce((a,r)=>a+amtOf(r),0);
+  const usdLine = live.length
+    ? `<span class="caps">Dollars stated:</span> ${stated.length ? fmtUsd(liveUsd) : "none"} across ${stated.length} of ${live.length} live ${live.length===1?VOCAB.item:VOCAB.items}${
+        live.length-stated.length ? ` <span class="sub">(${live.length-stated.length} state no amount)</span>` : ""}${
+        outUsd ? ` <span class="sub">· screened out: ${fmtUsd(outUsd)}</span>` : ""}`
+    : `<span class="caps">Dollars stated:</span> no live ${VOCAB.items}`;
   document.getElementById("verdict").innerHTML = `
     <div class="sheetcap" role="status">
       <p class="sit">${gen ? esc(VOCAB.run+" "+gen) : "Awaiting first "+VOCAB.noun}</p>
@@ -734,6 +854,7 @@ function renderVerdict(){
       <p class="l2 ${soon&&soon.days<=5?"red":""}">${soon
         ? `<span class="caps">Next date:</span> ${esc(soon.close)} (${soon.days} business day${soon.days===1?"":"s"})`
         : `<span class="caps">Next date:</span> no live windows`}</p>
+      <p class="l2">${usdLine}</p>
       <p class="runp"><button class="tl" data-goto="feed">${DATA.length} ${VOCAB.items} on the docket</button> ·
         <button class="tl" data-goto="windows">${wins.length} live window${wins.length===1?"":"s"}${screened?` (+${screened} screened out or watch)`:""}</button> ·
         <button class="tl" data-goto="hypo">${HYPOTHESES.length} hypotheses</button>${dz?` · <button class="tl" data-goto="dismissed">${dz} dismissed</button>`:""}${
@@ -748,6 +869,62 @@ function renderVerdict(){
     const age = (Date.now() - new Date(+m[1],+m[2]-1,+m[3]).getTime())/864e5;
     sb.innerHTML = age>9 ? `<div class="stale">This ${VOCAB.noun} is ${Math.floor(age)} days old. The weekly ${VOCAB.noun} may not have happened; treat the sheet as stale.</div>` : "";
   }
+}
+
+// ── Map: the whole scan placed by state (never filtered — the sheet states facts about the scan);
+//    the picked state inverts. Geometry is drawn once; classes and labels update per render. ──
+const SMALL = ["NH","VT","MA","RI","CT","NJ","DE","MD","DC"];   // led out to a column at the right
+function stStats(){
+  const m = {};
+  for(const r of DATA){ const c = stOf(r); if(!c) continue;
+    const o = m[c] || (m[c] = {n:0, live:0, act:0, usd:0});
+    o.n++; if(r.rec!=="NO_GO") o.live++; if(r.rec==="GO"||r.rec==="HR") o.act++; o.usd += amtOf(r); }
+  return m;
+}
+function drawMap(){
+  const svg = document.getElementById("usmap"); if(!svg || svg.childElementCount) return;
+  let html = "";
+  SMALL.forEach((c,i)=>{ const s = US_STATES.find(x=>x.id===c); if(!s) return;
+    const y = 170 + i*30; html += `<line class="lead" data-for="${c}" x1="${s.cx}" y1="${s.cy}" x2="982" y2="${y-5}"/>`; });
+  for(const s of US_STATES){
+    const i = SMALL.indexOf(s.id), lx = i<0 ? s.cx : 990, ly = i<0 ? s.cy+5 : 170+i*30;
+    html += `<g class="st" data-st="${s.id}" data-stpick="${s.id}" tabindex="-1" role="button" aria-label="${esc(STATE_NAMES[s.id])}">
+      <title></title><path class="s" d="${s.d}"/><text class="lbl ${i<0?"":"col"}" x="${lx}" y="${ly}">${s.id}<tspan class="cnt"></tspan></text></g>`;
+  }
+  svg.innerHTML = html;
+}
+function renderMap(){
+  const sec = document.getElementById("mapsec");
+  const show = state.view==="feed";
+  sec.hidden = !show; if(!show) return;
+  drawMap();
+  const m = stStats();
+  for(const g of document.querySelectorAll("#usmap .st")){
+    const c = g.dataset.st, o = m[c];
+    g.classList.toggle("has", !!o); g.classList.toggle("on", state.st===c);
+    g.tabIndex = o ? 0 : -1;
+    const cnt = g.querySelector(".cnt"); cnt.textContent = o ? " "+o.n : ""; cnt.classList.toggle("red", !!(o&&o.act));
+    g.querySelector("title").textContent = o
+      ? `${STATE_NAMES[c]}: ${o.n} ${o.n===1?VOCAB.item:VOCAB.items}, ${o.live} live${o.act?`, ${o.act} action required`:""}${o.usd?`, ${fmtUsd(o.usd)} stated`:""}`
+      : `${STATE_NAMES[c]}: no ${VOCAB.items}`;
+    g.setAttribute("aria-pressed", String(state.st===c));
+  }
+  // Paint order: a state with matters is appended last so its ink outline is not overdrawn by a
+  // neighbour's hairline; the picked state paints last of all.
+  const svg = document.getElementById("usmap");
+  for(const g of [...svg.querySelectorAll(".st.has:not(.on)"), ...svg.querySelectorAll(".st.on")]) svg.appendChild(g);
+  const codes = Object.keys(m).filter(c=>c!=="US").sort((a,b)=>(m[b].n-m[a].n)||a.localeCompare(b));
+  const line = c => { const o = m[c]; return `<div class="stl pick ${state.st===c?"on":""}" data-stpick="${c}" tabindex="0" role="button" aria-pressed="${state.st===c}">
+      <span class="c-code">${c}</span><span class="c-name">${esc(stName(c))}</span>
+      <span class="c-n">${o.n}</span><span class="c-l ${o.act?"red":""}">${o.live}</span>
+      <span class="c-usd ${o.usd?"":"none"}">${o.usd?fmtUsd(o.usd):"—"}</span></div>`; };
+  document.getElementById("stlines").innerHTML = (codes.length||m.US)
+    ? `<div class="stl head" aria-hidden="true"><span class="c-code"></span><span class="c-name">Place</span><span class="c-n">${VOCAB.items}</span><span class="c-l">Live</span><span class="c-usd">$ stated</span></div>`
+      + (m.US ? line("US") : "") + codes.map(line).join("")
+    : "";
+  document.getElementById("mapcount").textContent = codes.length + (codes.length===1?" state":" states") + (m.US?" + federal":"");
+  document.getElementById("mapfn").innerHTML = `Every ${VOCAB.item} on the sheet, screened-out included. Live counts ${VOCAB.items} not screened out; a red live count marks action required. $ stated sums the amounts the postings state${
+    state.st ? ` · <button class="tl" data-stpick="${state.st}">Clear the ${esc(stName(state.st))} filter</button>` : ""}.`;
 }
 
 // ── Calendar: live next dates only; screened-out and watch windows drop off, counted in the footnote ──
@@ -817,9 +994,10 @@ function renderFeed(){
   el.innerHTML = html || `<div class="empty">Nothing matches.${filtersActive()?` <button class="tl" data-clear>Clear filters and search</button>.`:""}${DATA.length?"":" Run /relay-grants to populate the docket."}</div>`;
   const titles = {feed:"Docket", windows:"Calendar", starred:"Starred", dismissed:"Dismissed"};
   document.getElementById("vtitle").textContent =
-    state.jur ? (TIER_LABEL[state.jur]||state.jur)+" · "+(titles[state.view]||"Docket")
-              : state.cls ? (INST_LABEL[state.cls]?.[0]||state.cls)+" · "+(titles[state.view]||"Docket")
-              : titles[state.view]||"Docket";
+    state.st ? stName(state.st)+" · "+(titles[state.view]||"Docket")
+             : state.jur ? (TIER_LABEL[state.jur]||state.jur)+" · "+(titles[state.view]||"Docket")
+             : state.cls ? (INST_LABEL[state.cls]?.[0]||state.cls)+" · "+(titles[state.view]||"Docket")
+             : titles[state.view]||"Docket";
   document.getElementById("vcount").textContent = rows.length;
   document.getElementById("vsub").textContent = {
     feed:"",
@@ -831,7 +1009,7 @@ function renderFeed(){
 }
 
 function navBtn(label, key, val, count){
-  const on = (key==="view" && state.view===val) || (key==="cls" && (state.cls||"")===val) || (key==="jur" && (state.jur||"")===val);
+  const on = (key==="view" && state.view===val) || (key==="cls" && (state.cls||"")===val) || (key==="jur" && (state.jur||"")===val) || (key==="st" && (state.st||"")===val);
   return `<button data-k="${esc(key)}" data-v="${esc(val)}" class="${on?"on":""}" aria-pressed="${on}">
     <span>${esc(label)}</span>${count!==undefined?`<span class="n">${esc(String(count))}</span>`:""}</button>`;
 }
@@ -857,9 +1035,14 @@ function renderNav(){
       const n = DATA.filter(r=>tierOf(r)===j).length;
       return n?navBtn(TIER_LABEL[j],"jur",j,n):"";
     }).join("");
+  const sm = stStats(), codes = Object.keys(sm).filter(c=>c!=="US").sort((a,b)=>(sm[b].n-sm[a].n)||a.localeCompare(b));
+  document.getElementById("stnav").innerHTML =
+    navBtn("All","st","",undefined) +
+    (sm.US ? navBtn("Federal","st","US",sm.US.n) : "") +
+    codes.map(c=>navBtn(STATE_NAMES[c]||c,"st",c,sm[c].n)).join("");
 }
 
-function renderAll(){ renderNav(); renderVerdict(); renderCalendar(); renderFeed(); }
+function renderAll(){ renderNav(); renderVerdict(); renderMap(); renderCalendar(); renderFeed(); }
 
 // ── Dialog manager: one dialog at a time; background inert while any is open;
 //    focus restored on close ──
@@ -892,6 +1075,8 @@ function openPanel(i, srcRow){
       <dt>Summary</dt><dd>${esc(r.summary)}</dd>
       <dt>Eligibility</dt><dd>${eligHtml(r)}</dd>
       <dt>Net to Relay</dt><dd>${esc(r.net||"—")}</dd>
+      <dt>Amount</dt><dd>${amtOf(r) ? usdFull(amtOf(r))+(r.amtNote?" · "+esc(r.amtNote):"") : esc(r.amtNote||"not stated")}</dd>
+      <dt>Place</dt><dd>${esc(stName(stOf(r))||"—")}</dd>
       <dt>Instrument</dt><dd>${esc(r.inst||"—")}</dd>
       <dt>Effort</dt><dd>${esc(r.effort||"—")}</dd>
       <dt>Source</dt><dd>${esc(r.source)}${safeUrl(r.url)?` · <a href="${esc(safeUrl(r.url))}" target="_blank" rel="noopener">${VOCAB.open}</a>`:""}</dd>
@@ -967,6 +1152,7 @@ function palItems(q){
   for(const [l,v] of views) items.push({label:"Go to "+l, k:"view", act:()=>{state.view=v;}});
   for(const c of Object.keys(INST_LABEL)) items.push({label:"Filter: "+INST_LABEL[c][0], k:"instrument", act:()=>{state.cls=c;}});
   for(const j of ["federal","state","district"]) items.push({label:"Filter: "+TIER_LABEL[j], k:"tier", act:()=>{state.jur=j;}});
+  { const sm = stStats(); for(const c of Object.keys(sm).sort()) items.push({label:"Filter: "+stName(c), k:"place", act:()=>{state.st=c;}}); }
   items.push({label:"Clear filters", k:"filters", act:clearFilters});
   items.push({label:"Toggle dark mode", k:"theme", act:toggleTheme});
   for(const r of DATA) items.push({label:"No. "+r._no+" "+r.title, k:esc(TIER_LABEL[tierOf(r)]), act:()=>openPanel(DATA.indexOf(r)), open:true});
@@ -1065,18 +1251,26 @@ document.addEventListener("click", e=>{
       if(k==="view") state.view = v;
       if(k==="cls") state.cls = v||null;
       if(k==="jur") state.jur = v||null;
-      state.sel = -1; renderNav(); renderCalendar(); renderFeed();
+      if(k==="st") state.st = v||null;
+      state.sel = -1; renderNav(); renderMap(); renderCalendar(); renderFeed();
     });
     if(window.innerWidth<=760) setIndex(false);
     return;
   }
+  const sp = e.target.closest("[data-stpick]");
+  if(sp){ const v = sp.dataset.stpick;
+    if(sp.classList.contains("st") && !sp.classList.contains("has")) return;
+    rerender(()=>{ state.st = state.st===v ? null : v; state.sel=-1; renderNav(); renderMap(); renderCalendar(); renderFeed(); });
+    // Keyboard activation (synthetic click, detail 0) keeps focus on the re-rendered control; a mouse click leaves no focus ring behind.
+    if(e.detail===0){ const again = document.querySelector(`[data-stpick="${v}"].on, #usmap [data-stpick="${v}"]`); if(again && again.focus) again.focus({preventScroll:true}); }
+    return; }
   const grp = e.target.closest("[data-grp]");
   if(grp){ const g = grp.dataset.grp;
     collapsed.has(g)?collapsed.delete(g):collapsed.add(g);
     lsSet("fd2_collapsed", JSON.stringify([...collapsed]));
     rerender(renderFeed); return; }
   const vc = e.target.closest("[data-goto]");
-  if(vc){ rerender(()=>{ state.view = vc.dataset.goto; state.sel=-1; renderNav(); renderCalendar(); renderFeed(); }); return; }
+  if(vc){ rerender(()=>{ state.view = vc.dataset.goto; state.sel=-1; renderNav(); renderMap(); renderCalendar(); renderFeed(); }); return; }
   if(e.target.id==="pstar"){ const r=DATA[+e.target.dataset.i];
     tSet(r,{star:!tGet(r).star}); openPanel(+e.target.dataset.i); return; }
   if(e.target.id==="pdismiss"){ const i=+e.target.dataset.i; const r=DATA[i];
@@ -1141,6 +1335,8 @@ document.addEventListener("keydown", e=>{
   // Standard keys (always on)
   if(e.key==="ArrowDown"&&!panelOpen&&!helpOpen){ e.preventDefault(); moveSel(1); return; }
   if(e.key==="ArrowUp"&&!panelOpen&&!helpOpen){ e.preventDefault(); moveSel(-1); return; }
+  if((e.key==="Enter"||e.key===" ") && document.activeElement.dataset?.stpick){
+    e.preventDefault(); document.activeElement.dispatchEvent(new MouseEvent("click",{bubbles:true})); return; }
   if((e.key==="Enter"||e.key===" ") && document.activeElement.classList?.contains("row")){
     e.preventDefault();
     if(document.activeElement.classList.contains("openrow")) closePanel(); else openPanel(+document.activeElement.dataset.i, document.activeElement);
@@ -1189,7 +1385,7 @@ document.getElementById("palq") && document.getElementById("palq").addEventListe
   document.getElementById("updated").textContent = gen ? VOCAB.run+" "+gen : "Awaiting first "+VOCAB.noun;
   // Static copy that names a sheet noun is filled from VOCAB, never edited as a string.
   document.querySelectorAll("[data-vocab]").forEach(el=>{ el.textContent = VOCAB[el.dataset.vocab]; });
-  document.getElementById("palq").placeholder = `Type a view, tier, instrument, or ${VOCAB.item}…`;
+  document.getElementById("palq").placeholder = `Type a view, tier, place, instrument, or ${VOCAB.item}…`;
   document.getElementById("printhead").textContent = "Public Funding Docket · Relay GSE" + (gen ? " · "+VOCAB.run+" "+gen : ""); }
 themeLabel();
 // ── Inline-entry guard: feed rebuilds replace line nodes, so the entry is parked
