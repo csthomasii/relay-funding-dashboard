@@ -137,6 +137,30 @@
   .stl.pick:hover,.stl.on{background:var(--band)}
   .stl.on .c-code{font-weight:700}
   .stl .c-l.red{color:var(--red)}
+  /* Wide sheets seat the place table and the picked place's matters beside the map instead of
+     leaving the right of the map empty; narrower sheets stack as before and the docket below
+     answers for the picked place, so the detail table hides there. */
+  .mapgrid{display:grid;grid-template-columns:minmax(0,1fr);column-gap:48px;align-items:start}
+  .stdetail{display:none;margin-top:32px}
+  @media (min-width:1301px){
+    .mapgrid{grid-template-columns:minmax(0,880px) minmax(400px,1fr)}
+    .mapcol{min-width:0}
+    .mapside{min-width:0;padding-top:4px}
+    .stdetail{display:block}
+  }
+  .stdetail .dh{display:flex;align-items:baseline;justify-content:space-between;gap:2ch;margin:0 0 8px;line-height:1.5}
+  .stdetail .dh .name{font-weight:700;text-transform:uppercase}
+  .stdetail .dh .sub{color:var(--ink2)}
+  .stdetail .dh .tl{flex:none}
+  .stdetail .hint{margin:0;color:var(--ink2);font-size:12px;max-width:60ch}
+  .sdl{display:grid;grid-template-columns:4ch minmax(0,1fr) 12ch 5ch 14ch;column-gap:1.5ch;align-items:baseline;
+    padding:8px 0;border-top:1px solid var(--hair);line-height:1.5}
+  .stdetail .sdl:last-child{border-bottom:1px solid var(--hair)}
+  .sdl.head{color:var(--ink2);text-transform:uppercase;border-top:0;padding:0 0 6px;align-items:end}
+  .sdl.head > span{font-size:12px;line-height:1.25}
+  .sdl.pick{cursor:pointer;transition:background var(--t) var(--e-out)}
+  .sdl.pick:hover,.sdl.pick.sel{background:var(--band)}
+  .sdl.dim{color:var(--ink2)}
 
   /* ── Lines: one hard column grid, every number in its column ── */
   .dl{display:grid;grid-template-columns:4ch minmax(0,1fr) 12ch 8ch 30ch 3ch;column-gap:2ch;align-items:baseline;
@@ -306,6 +330,7 @@
     body{font-size:10.5pt}
     .printhead{display:block;text-transform:uppercase;font-weight:700;border-bottom:1px solid #000;padding:0 0 6px;margin:0 0 18px}
     .dl,.cl,.hyp,.stl,.usmap{break-inside:avoid}
+    .stdetail{display:none}
     .sec{margin-bottom:36pt}
     .c-bd.red::after{content:" (urgent)"}
     a{text-decoration:none}
@@ -353,9 +378,16 @@
 
     <section class="sec" id="mapsec" aria-labelledby="maptitle">
       <div class="sechead"><h2 id="maptitle" data-vocab="where">Where the matters sit</h2><span class="n" id="mapcount"></span></div>
-      <svg class="usmap" id="usmap" viewBox="0 0 1040 610" role="group" aria-label="Map of the United States. States carrying matters are filled; press Enter on a state to filter the docket to it."></svg>
-      <div class="stlines" id="stlines"></div>
-      <p class="fn" id="mapfn"></p>
+      <div class="mapgrid">
+        <div class="mapcol">
+          <svg class="usmap" id="usmap" viewBox="0 0 1040 610" role="group" aria-label="Map of the United States. States carrying matters are filled; press Enter on a state to filter the docket to it."></svg>
+          <p class="fn" id="mapfn"></p>
+        </div>
+        <div class="mapside">
+          <div class="stlines" id="stlines"></div>
+          <div class="stdetail" id="stdetail" aria-live="polite"></div>
+        </div>
+      </div>
     </section>
 
     <section class="sec" id="calsec" aria-labelledby="caltitle">
@@ -924,9 +956,43 @@ function renderMap(){
     ? `<div class="stl head" aria-hidden="true"><span class="c-code"></span><span class="c-name">Place</span><span class="c-n">${VOCAB.items}</span><span class="c-l">Live</span><span class="c-usd">$ stated</span></div>`
       + (m.US ? line("US") : "") + codes.map(line).join("")
     : "";
+  renderStDetail(m);
   document.getElementById("mapcount").textContent = codes.length + (codes.length===1?" state":" states") + (m.US?" + federal":"");
   document.getElementById("mapfn").innerHTML = `Every ${VOCAB.item} on the sheet, screened-out included. Live counts ${VOCAB.items} not screened out; a red live count marks action required. $ stated sums the amounts the postings state${
     state.st ? ` · <button class="tl" data-stpick="${state.st}">Clear the ${esc(stName(state.st))} filter</button>` : ""}.`;
+}
+
+// ── Place detail: the picked place's matters in docket order, seated beside the map on wide sheets.
+//    Every matter of the place is listed, screened-out and dismissed included, as the map counts them;
+//    a line opens its entry in the docket below. ──
+function renderStDetail(m){
+  const el = document.getElementById("stdetail"); if(!el) return;
+  const c = state.st, o = c && m[c];
+  if(!o){ el.innerHTML = `<p class="hint">Pick a state on the map, or a line in the table, to list its ${VOCAB.items} here.</p>`; return; }
+  const rows = DATA.filter(r=>stOf(r)===c).sort((a,b)=>a._no-b._no);
+  const line = r => { const i = DATA.indexOf(r), t = tGet(r);
+    return `<div class="sdl pick ${t.dismissed?"dim":""} ${state.sel===i?"sel":""}" data-open="${i}" tabindex="0" role="button"
+        aria-label="No. ${r._no}, ${esc(r.title)}, ${esc(REC_LABEL[r.rec]||r.rec)}. Press Enter for the entry.">
+      <span class="c-no">${r._no}</span>
+      <span class="c-m">${esc(r.title)}${t.dismissed?`<span class="stamp">Dismissed</span>`:""}${t.star?`<span class="stamp">Starred</span>`:""}</span>
+      ${dateCell(r)}${daysCell(r)}
+      <span class="c-r">${esc(REC_LABEL[r.rec]||r.rec)}</span></div>`; };
+  el.innerHTML = `<div class="dh"><span><span class="name">${esc(stName(c))}</span> <span class="sub">· ${o.n} ${o.n===1?VOCAB.item:VOCAB.items} · ${o.live} live${
+      o.act ? ` · <span class="red">${o.act} action required</span>` : ""}${o.usd ? ` · ${fmtUsd(o.usd)} stated` : " · no amount stated"}</span></span>
+      <button class="tl" data-stpick="${c}">Clear</button></div>
+    <div class="sdl head" aria-hidden="true"><span class="c-no">No.</span><span class="c-m">${VOCAB.col}</span><span class="c-d">Next date</span><span class="c-bd">${VOCAB.days}</span><span class="c-r">Recommendation</span></div>`
+    + rows.map(line).join("");
+}
+// A detail line opens the matter's entry where it sits in the docket: a folded section is unfolded
+// for this visit only (the saved fold preference is not touched), and a dismissed matter is shown in
+// the Dismissed view, which is the only list that holds it.
+function openFromDetail(i){
+  const r = DATA[i]; if(!r) return;
+  if(tGet(r).dismissed && state.view!=="dismissed"){ state.view="dismissed"; state.sel=i; renderNav(); renderMap(); renderCalendar(); renderFeed(); }
+  else if(collapsed.has(r.rec)){ collapsed.delete(r.rec); renderFeed(); }
+  openPanel(i);
+  const prow = document.querySelector(`#feed .row[data-i="${i}"]`);
+  if(prow) prow.scrollIntoView({block:"center"});
 }
 
 // ── Calendar: live next dates only; screened-out and watch windows drop off, counted in the footnote ──
@@ -1259,6 +1325,8 @@ document.addEventListener("click", e=>{
     if(window.innerWidth<=760) setIndex(false);
     return;
   }
+  const so = e.target.closest("[data-open]");
+  if(so){ openFromDetail(+so.dataset.open); return; }
   const sp = e.target.closest("[data-stpick]");
   if(sp){ const v = sp.dataset.stpick;
     if(sp.classList.contains("st") && !sp.classList.contains("has")) return;
@@ -1337,6 +1405,8 @@ document.addEventListener("keydown", e=>{
   // Standard keys (always on)
   if(e.key==="ArrowDown"&&!panelOpen&&!helpOpen){ e.preventDefault(); moveSel(1); return; }
   if(e.key==="ArrowUp"&&!panelOpen&&!helpOpen){ e.preventDefault(); moveSel(-1); return; }
+  if((e.key==="Enter"||e.key===" ") && document.activeElement.dataset?.open){
+    e.preventDefault(); openFromDetail(+document.activeElement.dataset.open); return; }
   if((e.key==="Enter"||e.key===" ") && document.activeElement.dataset?.stpick){
     e.preventDefault(); document.activeElement.dispatchEvent(new MouseEvent("click",{bubbles:true})); return; }
   if((e.key==="Enter"||e.key===" ") && document.activeElement.classList?.contains("row")){
